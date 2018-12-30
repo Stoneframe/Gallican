@@ -30,6 +30,15 @@ public class DatabaseManager
 				applicationInfo.create();
 				applicationInfo.setVersion(CURRENT_VERSION);
 			}
+			else if (applicationInfo.getVersion() > CURRENT_VERSION)
+			{
+				System.err.println("Database version higher than application version.");
+				System.exit(1);
+			}
+			else if (applicationInfo.getVersion() < CURRENT_VERSION)
+			{
+				updateDatabase();
+			}
 		}
 		catch (SQLException e)
 		{
@@ -40,5 +49,10 @@ public class DatabaseManager
 	private Connection createConnection() throws SQLException
 	{
 		return DriverManager.getConnection("jdbc:derby:database/" + name + ";create=true");
+	}
+
+	private void updateDatabase()
+	{
+
 	}
 }

@@ -10,6 +10,8 @@ public class Database
 {
 	private final String name;
 
+	private DatabaseInfo databaseInfo;
+
 	public Database(String name) throws ClassNotFoundException
 	{
 		Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
@@ -23,7 +25,7 @@ public class Database
 		{
 			Connection connection = createConnection();
 
-			DatabaseInfo databaseInfo = new DatabaseInfo(connection);
+			databaseInfo = new DatabaseInfo(connection);
 
 			if (!databaseInfo.exists())
 			{

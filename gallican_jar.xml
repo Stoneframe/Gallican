@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project Gallican">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <!--define folder properties-->
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.workspace" value="${dir.buildfile}/.."/>
+    <property name="dir.jarfile" value="${dir.buildfile}/release"/>
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/Gallican.jar" filesetmanifest="mergewithoutmain" duplicate="preserve">
+            <manifest>
+                <attribute name="Main-Class" value="gallican.Gallican"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="${dir.buildfile}/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/lib/derby.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/lib/eclipselink.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/lib/javax.persistence_2.2.1.v201807122140.jar"/>
+        </jar>
+    </target>
+</project>

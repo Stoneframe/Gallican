@@ -34,4 +34,9 @@ public class Gallican
 		stage.sizeToScene();
 		stage.show();
 	}
+
+	public static void main(String[] args)
+	{
+		launch(args);
+	}
 }

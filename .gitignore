@@ -62,5 +62,7 @@ local.properties
 # End of https://www.gitignore.io/api/eclipse
 
 # Gallican
+/release/
 /database/
 /derby.log
+/gallican_exe.out.xml

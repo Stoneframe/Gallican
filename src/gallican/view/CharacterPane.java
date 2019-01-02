@@ -4,7 +4,6 @@ import javax.persistence.EntityManager;
 
 import gallican.model.Character;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -36,17 +35,14 @@ public class CharacterPane
 		title = new Text("Character");
 		title.setFont(new Font(20));
 
-		BooleanBinding characterNullBinding =
-				Bindings.createBooleanBinding(() -> character.get() == null, character);
-
 		nameTextField = new TextField();
 		nameTextField.setMinWidth(200);
-		nameTextField.disableProperty().bind(characterNullBinding);
+		nameTextField.disableProperty().bind(Bindings.isNull(character));
 
 		saveButton = new Button("Save");
 		saveButton.setMinWidth(70);
 		saveButton.setOnAction(this::saveButtonClicked);
-		saveButton.disableProperty().bind(characterNullBinding);
+		saveButton.disableProperty().bind(Bindings.isNull(character));
 
 		character.addListener(this::characterChanged);
 

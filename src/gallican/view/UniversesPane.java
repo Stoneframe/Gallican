@@ -5,6 +5,8 @@ import javax.persistence.TypedQuery;
 
 import gallican.model.Universe;
 import gallican.util.Util;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -58,12 +60,17 @@ public class UniversesPane
 		addButton.setMinWidth(70);
 		addButton.setOnAction(this::addButtonClicked);
 
+		BooleanBinding universeNullBinding =
+				Bindings.createBooleanBinding(() -> universe.get() == null, universe);
+
 		editButton = new Button("Edit");
 		editButton.setMinWidth(70);
+		editButton.disableProperty().bind(universeNullBinding);
 		editButton.setOnAction(this::editButtonClicked);
 
 		removeButton = new Button("Remove");
 		removeButton.setMinWidth(70);
+		removeButton.disableProperty().bind(universeNullBinding);
 		removeButton.setOnAction(this::removeButtonClicked);
 
 		setHgap(5);

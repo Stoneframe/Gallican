@@ -5,6 +5,7 @@ import javax.persistence.EntityManager;
 import gallican.model.Character;
 import gallican.model.Universe;
 import gallican.util.Util;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -45,10 +46,15 @@ public class CharacterOverviewPane
 
 		addButton = new Button("Add");
 		addButton.setMinWidth(70);
+		addButton.disableProperty().bind(Bindings.isNull(universe));
 		addButton.setOnAction(this::addButtonClicked);
 
 		removeButton = new Button("Remove");
 		removeButton.setMinWidth(70);
+		removeButton.disableProperty().bind(
+			Bindings.or(
+				Bindings.isNull(universe),
+				Bindings.isNull(characterListView.getSelectionModel().selectedItemProperty())));
 		removeButton.setOnAction(this::removeButtonClicked);
 
 		buttonPane = new FlowPane(addButton, removeButton);

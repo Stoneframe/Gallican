@@ -1,5 +1,9 @@
 package gallican;
 
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -14,18 +18,14 @@ public class Gallican
 	extends Application
 {
 	private static final String PERSISTENCE_UNIT_NAME = "gallican";
-	private static EntityManagerFactory factory;
 
 	@Override
 	public void start(Stage stage) throws Exception
 	{
-		DatabaseManager database = new DatabaseManager("gallicanDB");
+		DatabaseManager database = new DatabaseManager(getJavaxPersistenceJdbcUrl());
 		database.setup();
 
-		factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-		EntityManager entityManager = factory.createEntityManager();
-
-		GallicanPane gallicanPane = new GallicanPane(entityManager);
+		GallicanPane gallicanPane = new GallicanPane(createEntityManager());
 
 		Scene scene = new Scene(gallicanPane);
 
@@ -33,6 +33,33 @@ public class Gallican
 		stage.setScene(scene);
 		stage.sizeToScene();
 		stage.show();
+	}
+
+	private EntityManager createEntityManager()
+	{
+		Map<String, String> properties = new HashMap<>();
+
+		properties.put("javax.persistence.jdbc.url", getJavaxPersistenceJdbcUrl());
+
+		EntityManagerFactory factory =
+				Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, properties);
+
+		return factory.createEntityManager();
+	}
+
+	private String getJavaxPersistenceJdbcUrl()
+	{
+		return "jdbc:derby:" + getDatabasePath() + ";create=true";
+	}
+
+	private String getDatabasePath()
+	{
+		return Paths
+			.get(
+				System.getProperty("user.home"),
+				"AppData/Local/Gallican/gallicanDb")
+			.toString()
+			.replace("\\", "/");
 	}
 
 	public static void main(String[] args)

@@ -8,15 +8,15 @@ public class DatabaseManager
 {
 	private static final int CURRENT_VERSION = 1;
 
-	private final String name;
+	private final String javaxPersistenceJdbcUrl;
 
 	private ApplicationInfo applicationInfo;
 
-	public DatabaseManager(String name) throws ClassNotFoundException
+	public DatabaseManager(String javaxPersistenceJdbcUrl) throws ClassNotFoundException
 	{
 		Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
 
-		this.name = name;
+		this.javaxPersistenceJdbcUrl = javaxPersistenceJdbcUrl;
 	}
 
 	public void setup()
@@ -48,7 +48,7 @@ public class DatabaseManager
 
 	private Connection createConnection() throws SQLException
 	{
-		return DriverManager.getConnection("jdbc:derby:database/" + name + ";create=true");
+		return DriverManager.getConnection(javaxPersistenceJdbcUrl);
 	}
 
 	private void updateDatabase()

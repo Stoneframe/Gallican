@@ -9,14 +9,17 @@ import java.util.stream.Collectors;
 
 import gallican.database.upgrade.DatabaseUpgrade;
 import gallican.database.upgrade.DatabaseUpgrade2;
+import gallican.database.upgrade.DatabaseUpgrade3;
 
 public class DatabaseManager
 {
-	private static final int CURRENT_VERSION = 2;
+	private static final int CURRENT_VERSION = 3;
 
 	private final String javaxPersistenceJdbcUrl;
 
-	private final List<DatabaseUpgrade> upgrades = Arrays.asList(new DatabaseUpgrade2());
+	private final List<DatabaseUpgrade> upgrades = Arrays.asList(
+		new DatabaseUpgrade2(),
+		new DatabaseUpgrade3());
 
 	private ApplicationInfo applicationInfo;
 
@@ -63,18 +66,27 @@ public class DatabaseManager
 	private void updateDatabase(ApplicationInfo applicationInfo, Connection connection)
 			throws SQLException
 	{
-		int version = applicationInfo.getVersion();
-
-		List<DatabaseUpgrade> upgradesToRun = upgrades
-			.stream()
-			.filter(u -> u.getVersion() > version)
-			.collect(Collectors.toList());
-
-		for (DatabaseUpgrade upgrade : upgradesToRun)
+		try
 		{
-			upgrade.upgrade(connection);
 
-			applicationInfo.setVersion(upgrade.getVersion());
+			int version = applicationInfo.getVersion();
+
+			List<DatabaseUpgrade> upgradesToRun = upgrades
+				.stream()
+				.filter(u -> u.getVersion() > version)
+				.collect(Collectors.toList());
+
+			for (DatabaseUpgrade upgrade : upgradesToRun)
+			{
+				upgrade.upgrade(connection);
+
+				applicationInfo.setVersion(upgrade.getVersion());
+			}
+		}
+		catch (SQLException e)
+		{
+			connection.rollback();
+			throw e;
 		}
 	}
 }

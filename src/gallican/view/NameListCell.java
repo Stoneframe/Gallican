@@ -1,9 +1,12 @@
 package gallican.view;
 
+import gallican.model.Dirtyable;
 import gallican.model.Named;
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.ListCell;
+import javafx.scene.paint.Color;
 
-public class NameListCell<T extends Named>
+public class NameListCell<T extends Named & Dirtyable>
 	extends ListCell<T>
 {
 	@Override
@@ -12,6 +15,7 @@ public class NameListCell<T extends Named>
 		super.updateItem(item, empty);
 
 		textProperty().unbind();
+		textFillProperty().unbind();
 
 		if (empty || item == null)
 		{
@@ -20,6 +24,11 @@ public class NameListCell<T extends Named>
 		else
 		{
 			textProperty().bind(item.nameProperty());
+			textFillProperty().bind(
+				Bindings
+					.when(item.dirtyProperty())
+					.then(Color.RED)
+					.otherwise(Color.BLACK));
 		}
 	}
 }

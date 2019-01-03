@@ -23,6 +23,8 @@ import javafx.beans.property.SimpleLongProperty;
 @MappedSuperclass
 @Access(AccessType.PROPERTY)
 public abstract class EntityBase
+	implements
+		Dirtyable
 {
 	private final LongProperty id = new SimpleLongProperty();
 

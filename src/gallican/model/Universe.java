@@ -41,12 +41,12 @@ public class Universe
 	@Column(name = "id")
 	public long getId()
 	{
-		return id.get();
+		return idProperty().get();
 	}
 
 	public void setId(long id)
 	{
-		this.id.set(id);
+		idProperty().set(id);
 	}
 
 	public LongProperty idProperty()
@@ -57,12 +57,12 @@ public class Universe
 	@Column(name = "name")
 	public String getName()
 	{
-		return name.get();
+		return nameProperty().get();
 	}
 
 	public void setName(String name)
 	{
-		this.name.set(name);
+		nameProperty().set(name);
 	}
 
 	public StringProperty nameProperty()
@@ -72,18 +72,18 @@ public class Universe
 
 	public ObservableList<Character> characters()
 	{
-		return FXCollections.unmodifiableObservableList(characters.get());
+		return FXCollections.unmodifiableObservableList(charactersProperty().get());
 	}
 
 	public void addCharacter(Character character)
 	{
-		characters.get().add(character);
+		getCharacters().add(character);
 		character.setUniverse(this);
 	}
 
 	public void removeCharacter(Character character)
 	{
-		characters.get().remove(character);
+		getCharacters().remove(character);
 		character.setUniverse(null);
 	}
 
@@ -91,13 +91,13 @@ public class Universe
 	@JoinColumn(name = "UniverseId")
 	public List<Character> getCharacters()
 	{
-		return characters.getValue();
+		return charactersProperty().get();
 	}
 
 	@SuppressWarnings("unused")
 	private void setCharacters(List<Character> characters)
 	{
-		this.characters.setValue(FXCollections.observableArrayList(characters));
+		charactersProperty().set(FXCollections.observableArrayList(characters));
 	}
 
 	public ListProperty<Character> charactersProperty()

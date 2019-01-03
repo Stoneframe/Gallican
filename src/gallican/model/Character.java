@@ -34,12 +34,12 @@ public class Character
 	@Column(name = "id")
 	public long getId()
 	{
-		return id.get();
+		return idProperty().get();
 	}
 
 	public void setId(long id)
 	{
-		this.id.set(id);
+		idProperty().set(id);
 	}
 
 	public LongProperty idProperty()
@@ -50,12 +50,12 @@ public class Character
 	@Column(name = "name")
 	public String getName()
 	{
-		return name.get();
+		return nameProperty().get();
 	}
 
 	public void setName(String name)
 	{
-		this.name.set(name);
+		nameProperty().set(name);
 	}
 
 	public StringProperty nameProperty()
@@ -66,12 +66,17 @@ public class Character
 	@ManyToOne
 	public Universe getUniverse()
 	{
-		return universe.get();
+		return universeProperty().get();
 	}
 
 	public void setUniverse(Universe universe)
 	{
-		this.universe.set(universe);
+		universeProperty().set(universe);
+	}
+
+	public ObjectProperty<Universe> universeProperty()
+	{
+		return universe;
 	}
 
 	@Override

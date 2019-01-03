@@ -28,6 +28,11 @@ public class Universe
 	private final ListProperty<Character> characters =
 			new SimpleListProperty<>(FXCollections.observableArrayList());
 
+	public Universe()
+	{
+		track(name);
+	}
+
 	@Column(name = "name")
 	public String getName()
 	{

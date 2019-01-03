@@ -21,6 +21,11 @@ public class Character
 
 	private final ObjectProperty<Universe> universe = new SimpleObjectProperty<>();
 
+	public Character()
+	{
+		track(name);
+	}
+
 	@Column(name = "name")
 	public String getName()
 	{

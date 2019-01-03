@@ -41,8 +41,9 @@ public class CharacterPane
 
 		saveButton = new Button("Save");
 		saveButton.setMinWidth(70);
+		saveButton.setDisable(true);
 		saveButton.setOnAction(this::saveButtonClicked);
-		saveButton.disableProperty().bind(Bindings.isNull(character));
+		// saveButton.disableProperty().bind(Bindings.isNull(character));
 
 		character.addListener(this::characterChanged);
 
@@ -88,6 +89,7 @@ public class CharacterPane
 		if (oldValue != null)
 		{
 			nameTextField.textProperty().unbindBidirectional(oldValue.nameProperty());
+			saveButton.disableProperty().unbind();
 		}
 
 		nameTextField.clear();
@@ -95,6 +97,11 @@ public class CharacterPane
 		if (newValue != null)
 		{
 			nameTextField.textProperty().bindBidirectional(newValue.nameProperty());
+			saveButton.disableProperty().bind(newValue.dirtyProperty().not());
+		}
+		else
+		{
+			saveButton.setDisable(true);
 		}
 	}
 

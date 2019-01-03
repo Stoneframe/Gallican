@@ -30,9 +30,13 @@ public abstract class EntityBase
 
 	private final ReadOnlyBooleanWrapper dirty = new ReadOnlyBooleanWrapper(false);
 
+	private Property<?>[] properties;
+	private int prevHashCode;
+
 	protected void track(Property<?>... properties)
 	{
-		Arrays.stream(properties).forEach(p -> p.addListener(o -> setDirty(true)));
+		this.properties = properties;
+		Arrays.stream(properties).forEach(p -> p.addListener(o -> updateDirty()));
 	}
 
 	@Id
@@ -56,7 +60,7 @@ public abstract class EntityBase
 	@Transient
 	public boolean isDirty()
 	{
-		return dirtyProperty().get();
+		return dirty.get();
 	}
 
 	public ReadOnlyBooleanProperty dirtyProperty()
@@ -69,11 +73,25 @@ public abstract class EntityBase
 	@PostPersist
 	public void reset()
 	{
-		setDirty(false);
+		prevHashCode = hashCode();
+		updateDirty();
 	}
 
-	private void setDirty(boolean dirty)
+	@Override
+	public int hashCode()
 	{
-		this.dirty.set(dirty);
+		int hashCode = 0;
+
+		for (Property<?> property : properties)
+		{
+			hashCode ^= property.getValue().hashCode();
+		}
+
+		return hashCode;
+	}
+
+	private void updateDirty()
+	{
+		this.dirty.set(prevHashCode != hashCode());
 	}
 }

@@ -31,7 +31,7 @@ public abstract class EntityBase
 	private final ReadOnlyBooleanWrapper dirty = new ReadOnlyBooleanWrapper(false);
 
 	private Property<?>[] properties;
-	private int prevHashCode;
+	private int prevHashStatus;
 
 	protected void track(Property<?>... properties)
 	{
@@ -73,25 +73,26 @@ public abstract class EntityBase
 	@PostPersist
 	public void reset()
 	{
-		prevHashCode = hashCode();
+		prevHashStatus = calculateHashStatus();
 		updateDirty();
 	}
 
-	@Override
-	public int hashCode()
+	private void updateDirty()
+	{
+		this.dirty.set(prevHashStatus != calculateHashStatus());
+	}
+
+	private int calculateHashStatus()
 	{
 		int hashCode = 0;
 
 		for (Property<?> property : properties)
 		{
-			hashCode ^= property.getValue().hashCode();
+			hashCode ^= property.getValue() != null
+					? property.getValue().hashCode()
+					: 0;
 		}
 
 		return hashCode;
-	}
-
-	private void updateDirty()
-	{
-		this.dirty.set(prevHashCode != hashCode());
 	}
 }

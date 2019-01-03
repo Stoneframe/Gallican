@@ -18,28 +18,79 @@ public class Character
 		Named
 {
 	private final StringProperty name = new SimpleStringProperty();
+	private final StringProperty description = new SimpleStringProperty();
+	private final StringProperty personality = new SimpleStringProperty();
+	private final StringProperty powers = new SimpleStringProperty();
 
 	private final ObjectProperty<Universe> universe = new SimpleObjectProperty<>();
 
 	public Character()
 	{
-		track(name);
+		track(name, description, personality, powers);
 	}
 
 	@Column(name = "name")
 	public String getName()
 	{
-		return nameProperty().get();
+		return name.get();
 	}
 
 	public void setName(String name)
 	{
-		nameProperty().set(name);
+		this.name.set(name);
 	}
 
 	public StringProperty nameProperty()
 	{
 		return name;
+	}
+
+	@Column(name = "description")
+	public String getDescription()
+	{
+		return description.get();
+	}
+
+	public void setDescription(String description)
+	{
+		this.description.set(description);
+	}
+
+	public StringProperty descriptionProperty()
+	{
+		return description;
+	}
+
+	@Column(name = "personality")
+	public String getPersonality()
+	{
+		return personality.get();
+	}
+
+	public void setPersonality(String personality)
+	{
+		this.personality.set(personality);
+	}
+
+	public StringProperty personalityProperty()
+	{
+		return personality;
+	}
+
+	@Column(name = "powers")
+	public String getPowers()
+	{
+		return powers.get();
+	}
+
+	public void setPowers(String powers)
+	{
+		this.powers.set(powers);
+	}
+
+	public StringProperty powersProperty()
+	{
+		return powers;
 	}
 
 	@ManyToOne

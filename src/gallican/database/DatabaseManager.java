@@ -3,12 +3,20 @@ package gallican.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import gallican.database.upgrade.DatabaseUpgrade;
+import gallican.database.upgrade.DatabaseUpgrade2;
 
 public class DatabaseManager
 {
-	private static final int CURRENT_VERSION = 1;
+	private static final int CURRENT_VERSION = 2;
 
 	private final String javaxPersistenceJdbcUrl;
+
+	private final List<DatabaseUpgrade> upgrades = Arrays.asList(new DatabaseUpgrade2());
 
 	private ApplicationInfo applicationInfo;
 
@@ -37,12 +45,13 @@ public class DatabaseManager
 			}
 			else if (applicationInfo.getVersion() < CURRENT_VERSION)
 			{
-				updateDatabase();
+				updateDatabase(applicationInfo, connection);
 			}
 		}
 		catch (SQLException e)
 		{
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
@@ -51,8 +60,21 @@ public class DatabaseManager
 		return DriverManager.getConnection(javaxPersistenceJdbcUrl);
 	}
 
-	private void updateDatabase()
+	private void updateDatabase(ApplicationInfo applicationInfo, Connection connection)
+			throws SQLException
 	{
+		int version = applicationInfo.getVersion();
 
+		List<DatabaseUpgrade> upgradesToRun = upgrades
+			.stream()
+			.filter(u -> u.getVersion() > version)
+			.collect(Collectors.toList());
+
+		for (DatabaseUpgrade upgrade : upgradesToRun)
+		{
+			upgrade.upgrade(connection);
+
+			applicationInfo.setVersion(upgrade.getVersion());
+		}
 	}
 }

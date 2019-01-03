@@ -96,6 +96,8 @@ public class CharacterOverviewPane
 
 							getUniverse().addCharacter(character);
 						});
+
+					characterListView.getSelectionModel().selectLast();
 				});
 
 	}

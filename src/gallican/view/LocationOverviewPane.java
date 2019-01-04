@@ -38,6 +38,7 @@ public class LocationOverviewPane
 		this.entityManager = entityManager;
 
 		locationTreeView = new TreeView<>();
+		locationTreeView.setCellFactory(tc -> new NamedTreeCell<>());
 
 		universe.addListener(new ChangeListener<Universe>()
 		{

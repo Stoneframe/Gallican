@@ -30,16 +30,19 @@ public class Character
 	}
 
 	@Column(name = "name")
+	@Override
 	public String getName()
 	{
 		return name.get();
 	}
 
+	@Override
 	public void setName(String name)
 	{
 		this.name.set(name);
 	}
 
+	@Override
 	public StringProperty nameProperty()
 	{
 		return name;

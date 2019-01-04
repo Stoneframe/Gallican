@@ -21,19 +21,22 @@ public class DatabaseUpgrade3
 		{
 			statement.execute(
 				"create table SA.LOCATIONS ("
-						+ "	ID BIGINT not null primary key,"
+						+ "	ID BIGINT not null primary key GENERATED ALWAYS AS IDENTITY(START WITH 1, INCREMENT BY 1),"
 						+ "	NAME VARCHAR(255),"
-						+ "	UNIVERSE_ID BIGINT,"
 						+ " LOCATION_ID BIGINT,"
 						+ "	DESCRIPTION VARCHAR(1000))");
-			
-			statement.execute(
-				"ALTER TABLE SA.LOCATIONS"
-						+ "	ADD FOREIGN KEY (UNIVERSE_ID)"
-						+ "	REFERENCES SA.UNIVERSES (ID)");
 
 			statement.execute(
 				"ALTER TABLE SA.LOCATIONS"
+						+ "	ADD FOREIGN KEY (LOCATION_ID)"
+						+ "	REFERENCES SA.LOCATIONS (ID)");
+
+			statement.execute(
+				"ALTER TABLE SA.UNIVERSES"
+						+ " ADD COLUMN LOCATION_ID BIGINT");
+
+			statement.execute(
+				"ALTER TABLE SA.UNIVERSES"
 						+ "	ADD FOREIGN KEY (LOCATION_ID)"
 						+ "	REFERENCES SA.LOCATIONS (ID)");
 		}

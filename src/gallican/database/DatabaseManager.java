@@ -66,27 +66,31 @@ public class DatabaseManager
 	private void updateDatabase(ApplicationInfo applicationInfo, Connection connection)
 			throws SQLException
 	{
-		try
+		int version = applicationInfo.getVersion();
+
+		List<DatabaseUpgrade> upgradesToRun = upgrades
+			.stream()
+			.filter(u -> u.getVersion() > version)
+			.collect(Collectors.toList());
+
+		for (DatabaseUpgrade upgrade : upgradesToRun)
 		{
-
-			int version = applicationInfo.getVersion();
-
-			List<DatabaseUpgrade> upgradesToRun = upgrades
-				.stream()
-				.filter(u -> u.getVersion() > version)
-				.collect(Collectors.toList());
-
-			for (DatabaseUpgrade upgrade : upgradesToRun)
+			try
 			{
+				connection.setAutoCommit(false);
+
 				upgrade.upgrade(connection);
 
 				applicationInfo.setVersion(upgrade.getVersion());
+
+				connection.commit();
 			}
-		}
-		catch (SQLException e)
-		{
-			connection.rollback();
-			throw e;
+			catch (SQLException e)
+			{
+				connection.rollback();
+
+				throw e;
+			}
 		}
 	}
 }

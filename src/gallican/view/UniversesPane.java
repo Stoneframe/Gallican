@@ -3,6 +3,7 @@ package gallican.view;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import gallican.model.Location;
 import gallican.model.Universe;
 import gallican.util.Util;
 import javafx.beans.binding.Bindings;
@@ -98,8 +99,12 @@ public class UniversesPane
 				{
 					executeWithTransaction(() ->
 						{
+							Location location = new Location();
+							location.setName(name);
+
 							Universe universe = new Universe();
 							universe.setName(name);
+							universe.setLocation(location);
 
 							entityManager.persist(universe);
 							universes.add(universe);

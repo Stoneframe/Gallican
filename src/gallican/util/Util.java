@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
@@ -49,7 +49,7 @@ public class Util
 	}
 
 	public static <T, V> ObjectBinding<V> createNestedPropertyBinding(
-			ObjectProperty<T> property,
+			ReadOnlyObjectProperty<T> property,
 			Function<T, V> getNestedValue)
 	{
 		return Bindings.createObjectBinding(

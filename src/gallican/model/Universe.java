@@ -7,10 +7,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -25,8 +28,10 @@ public class Universe
 {
 	private final StringProperty name = new SimpleStringProperty();
 
-	private final ListProperty<Character> characters =
-			new SimpleListProperty<>(FXCollections.observableArrayList());
+	private final ListProperty<Character> characters = new SimpleListProperty<>(
+			FXCollections.observableArrayList());
+
+	private final ObjectProperty<Location> location = new SimpleObjectProperty<>();
 
 	public Universe()
 	{
@@ -82,6 +87,22 @@ public class Universe
 	public ListProperty<Character> charactersProperty()
 	{
 		return characters;
+	}
+
+	@OneToOne(orphanRemoval = true, cascade = CascadeType.ALL)
+	public Location getLocation()
+	{
+		return location.get();
+	}
+
+	public void setLocation(Location location)
+	{
+		this.location.set(location);
+	}
+
+	public ObjectProperty<Location> locationProperty()
+	{
+		return location;
 	}
 
 	@Override

@@ -5,8 +5,9 @@
 	version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
 	<persistence-unit name="gallican"
 		transaction-type="RESOURCE_LOCAL">
-		<class>gallican.model.Character</class>
 		<class>gallican.model.Universe</class>
+		<class>gallican.model.Character</class>
+		<class>gallican.model.Location</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver"
 				value="org.apache.derby.jdbc.EmbeddedDriver" />

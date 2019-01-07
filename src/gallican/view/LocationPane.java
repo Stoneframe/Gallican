@@ -42,6 +42,7 @@ public class LocationPane
 		nameTextField.disableProperty().bind(Bindings.isNull(location));
 
 		descriptionTextArea = new TextArea();
+		descriptionTextArea.setWrapText(true);
 		descriptionTextArea.disableProperty().bind(Bindings.isNull(location));
 
 		saveButton = new Button("Save");

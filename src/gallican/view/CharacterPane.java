@@ -44,12 +44,15 @@ public class CharacterPane
 		nameTextField.disableProperty().bind(Bindings.isNull(character));
 
 		descriptionTextArea = new TextArea();
+		descriptionTextArea.setWrapText(true);
 		descriptionTextArea.disableProperty().bind(Bindings.isNull(character));
 
 		personalityTextArea = new TextArea();
+		personalityTextArea.setWrapText(true);
 		personalityTextArea.disableProperty().bind(Bindings.isNull(character));
 
 		powersTextArea = new TextArea();
+		powersTextArea.setWrapText(true);
 		powersTextArea.disableProperty().bind(Bindings.isNull(character));
 
 		saveButton = new Button("Save");

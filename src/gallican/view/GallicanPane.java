@@ -40,4 +40,12 @@ public class GallicanPane
 		setTop(universesPane);
 		setCenter(tabPane);
 	}
+
+	public boolean isDirty()
+	{
+		return universesPane
+			.getAllUniverses()
+			.stream()
+			.anyMatch(u -> u.isDirty() || u.hasDirtyChildren());
+	}
 }

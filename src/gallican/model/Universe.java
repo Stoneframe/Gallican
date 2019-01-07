@@ -105,9 +105,30 @@ public class Universe
 		return location;
 	}
 
+	public boolean hasDirtyChildren()
+	{
+		return anyDirtyCharacters() || anyDirtyLocations();
+	}
+
 	@Override
 	public String toString()
 	{
 		return getId() + " - " + getName();
+	}
+
+	private boolean anyDirtyCharacters()
+	{
+		return getCharacters().stream().anyMatch(c -> c.isDirty());
+	}
+
+	private boolean anyDirtyLocations()
+	{
+		return isLocationDirty(getLocation());
+	}
+
+	private boolean isLocationDirty(Location location)
+	{
+		return location.isDirty()
+				|| location.getLocations().stream().anyMatch(l -> isLocationDirty(l));
 	}
 }

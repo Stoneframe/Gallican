@@ -7,6 +7,8 @@ import java.util.function.Function;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
@@ -44,6 +46,31 @@ public class Util
 			Consumer<String> ifPresent)
 	{
 		Optional<String> result = showTextInputDialog(title, header, content);
+
+		result.ifPresent(ifPresent);
+	}
+
+	public static Optional<ButtonType> showConfirmationDialog(
+			String title,
+			String header,
+			String content)
+	{
+		Alert confirmationDialog = new Alert(AlertType.CONFIRMATION);
+
+		confirmationDialog.setTitle(title);
+		confirmationDialog.setHeaderText(header);
+		confirmationDialog.setContentText(content);
+
+		return confirmationDialog.showAndWait();
+	}
+
+	public static void showConfirmationDialog(
+			String title,
+			String header,
+			String content,
+			Consumer<ButtonType> ifPresent)
+	{
+		Optional<ButtonType> result = showConfirmationDialog(title, header, content);
 
 		result.ifPresent(ifPresent);
 	}

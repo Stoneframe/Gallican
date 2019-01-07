@@ -89,6 +89,11 @@ public class UniversesPane
 		return universe;
 	}
 
+	public ObservableList<Universe> getAllUniverses()
+	{
+		return universes;
+	}
+
 	private void addButtonClicked(ActionEvent event)
 	{
 		Util.showTextInputDialog(

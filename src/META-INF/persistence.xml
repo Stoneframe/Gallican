@@ -8,6 +8,7 @@
 		<class>gallican.model.Universe</class>
 		<class>gallican.model.Character</class>
 		<class>gallican.model.Location</class>
+		<class>gallican.model.Event</class>
 		<properties>
 			<property name="javax.persistence.jdbc.driver"
 				value="org.apache.derby.jdbc.EmbeddedDriver" />

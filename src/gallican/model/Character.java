@@ -1,14 +1,21 @@
 package gallican.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 @Entity
 @Table(name = "Characters")
@@ -23,6 +30,9 @@ public class Character
 	private final StringProperty powers = new SimpleStringProperty();
 
 	private final ObjectProperty<Universe> universe = new SimpleObjectProperty<>();
+
+	private final ListProperty<Event> events = new SimpleListProperty<>(
+			FXCollections.observableArrayList());
 
 	public Character()
 	{
@@ -110,6 +120,27 @@ public class Character
 	public ObjectProperty<Universe> universeProperty()
 	{
 		return universe;
+	}
+
+	public ObservableList<Event> events()
+	{
+		return events;
+	}
+
+	@ManyToMany(mappedBy = "Characters")
+	public List<Event> getEvents()
+	{
+		return events.get();
+	}
+
+	protected void setEvents(List<Event> events)
+	{
+		this.events.set(FXCollections.observableArrayList(events));
+	}
+
+	public ListProperty<Event> eventsProperty()
+	{
+		return events;
 	}
 
 	@Override

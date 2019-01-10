@@ -2,7 +2,7 @@ package gallican.view;
 
 import javax.persistence.EntityManager;
 
-import gallican.model.Character;
+import gallican.model.Event;
 import gallican.model.Universe;
 import gallican.util.Util;
 import javafx.beans.binding.Bindings;
@@ -15,14 +15,14 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 
-public class CharacterOverviewPane
+public class EventOverviewPane
 	extends BorderPane
 {
 	private final EntityManager entityManager;
 
-	private final ListView<Character> characterListView;
+	private final ListView<Event> eventListView;
 
-	private final CharacterPane characterPane;
+	private final EventPane eventPane;
 
 	private final FlowPane buttonPane;
 	private final Button addButton;
@@ -30,19 +30,19 @@ public class CharacterOverviewPane
 
 	private final ObjectProperty<Universe> universe = new SimpleObjectProperty<>();
 
-	public CharacterOverviewPane(EntityManager entityManager)
+	public EventOverviewPane(EntityManager entityManager)
 	{
 		this.entityManager = entityManager;
 
-		characterListView = new ListView<>();
-		characterListView.setCellFactory(lc -> new NameListCell<>());
-		characterListView.itemsProperty().bind(
-			Util.createNestedPropertyBinding(universe, Universe::characters));
+		eventListView = new ListView<>();
+		eventListView.setCellFactory(lc -> new NameListCell<>());
+		eventListView.itemsProperty().bind(
+			Util.createNestedPropertyBinding(universe, Universe::events));
 
-		characterPane = new CharacterPane(entityManager);
-		characterPane.setPadding(new Insets(0, 0, 0, 10));
-		characterPane.characterProperty().bind(
-			characterListView.getSelectionModel().selectedItemProperty());
+		eventPane = new EventPane(entityManager);
+		eventPane.setPadding(new Insets(0, 0, 0, 10));
+		eventPane.eventProperty().bind(eventListView.getSelectionModel().selectedItemProperty());
+		eventPane.universeProperty().bind(universe);
 
 		addButton = new Button("Add");
 		addButton.setMinWidth(70);
@@ -54,15 +54,15 @@ public class CharacterOverviewPane
 		removeButton.disableProperty().bind(
 			Bindings.or(
 				Bindings.isNull(universe),
-				Bindings.isNull(characterListView.getSelectionModel().selectedItemProperty())));
+				Bindings.isNull(eventListView.getSelectionModel().selectedItemProperty())));
 		removeButton.setOnAction(this::removeButtonClicked);
 
 		buttonPane = new FlowPane(addButton, removeButton);
 		buttonPane.setHgap(5);
 		buttonPane.setPadding(new Insets(5, 0, 0, 0));
 
-		setLeft(characterListView);
-		setCenter(characterPane);
+		setLeft(eventListView);
+		setCenter(eventPane);
 		setBottom(buttonPane);
 	}
 
@@ -81,34 +81,31 @@ public class CharacterOverviewPane
 		return universe;
 	}
 
-	private void addButtonClicked(ActionEvent event)
+	private void addButtonClicked(ActionEvent e)
 	{
 		Util.showTextInputDialog(
-			"Create New Character",
-			"Name of new character",
+			"Create New Event",
+			"Name of new event",
 			"Name:",
 			(name) ->
 				{
 					executeWithTransaction(() ->
 						{
-							Character character = new Character();
-							character.setName(name);
+							Event event = new Event();
+							event.setName(name);
 
-							getUniverse().addCharacter(character);
+							getUniverse().addEvent(event);
 						});
-
-					characterListView.getSelectionModel().selectLast();
 				});
-
 	}
 
-	private void removeButtonClicked(ActionEvent event)
+	private void removeButtonClicked(ActionEvent e)
 	{
 		executeWithTransaction(() ->
 			{
-				Character character = characterListView.getSelectionModel().getSelectedItem();
+				Event event = eventListView.getSelectionModel().getSelectedItem();
 
-				getUniverse().removeCharacter(character);
+				getUniverse().removeEvent(event);
 			});
 	}
 

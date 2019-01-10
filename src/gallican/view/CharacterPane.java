@@ -2,11 +2,14 @@ package gallican.view;
 
 import javax.persistence.EntityManager;
 
+import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.MonadicBinding;
+import org.fxmisc.easybind.monadic.PropertyBinding;
+
 import gallican.model.Character;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
@@ -20,6 +23,12 @@ public class CharacterPane
 	extends GridPane
 {
 	private final EntityManager entityManager;
+
+	private final PropertyBinding<String> nameBinding;
+	private final PropertyBinding<String> descriptionBinding;
+	private final PropertyBinding<String> personalityBinding;
+	private final PropertyBinding<String> powersBinding;
+	private final MonadicBinding<Boolean> dirtyBinding;
 
 	private final Text title;
 
@@ -36,31 +45,50 @@ public class CharacterPane
 	{
 		this.entityManager = entityManager;
 
+		nameBinding = EasyBind
+			.monadic(character)
+			.selectProperty(Character::nameProperty);
+		descriptionBinding = EasyBind
+			.monadic(character)
+			.selectProperty(Character::descriptionProperty);
+		personalityBinding = EasyBind
+			.monadic(character)
+			.selectProperty(Character::personalityProperty);
+		powersBinding = EasyBind
+			.monadic(character)
+			.selectProperty(Character::powersProperty);
+		dirtyBinding = EasyBind
+			.select(character)
+			.selectObject(c -> c.dirtyProperty().not())
+			.orElse(true);
+
 		title = new Text("Character");
 		title.setFont(new Font(20));
 
 		nameTextField = new TextField();
 		nameTextField.setMinWidth(200);
 		nameTextField.disableProperty().bind(Bindings.isNull(character));
+		nameTextField.textProperty().bindBidirectional(nameBinding);
 
 		descriptionTextArea = new TextArea();
 		descriptionTextArea.setWrapText(true);
 		descriptionTextArea.disableProperty().bind(Bindings.isNull(character));
+		descriptionTextArea.textProperty().bindBidirectional(descriptionBinding);
 
 		personalityTextArea = new TextArea();
 		personalityTextArea.setWrapText(true);
 		personalityTextArea.disableProperty().bind(Bindings.isNull(character));
+		personalityTextArea.textProperty().bindBidirectional(personalityBinding);
 
 		powersTextArea = new TextArea();
 		powersTextArea.setWrapText(true);
 		powersTextArea.disableProperty().bind(Bindings.isNull(character));
+		powersTextArea.textProperty().bindBidirectional(powersBinding);
 
 		saveButton = new Button("Save");
 		saveButton.setMinWidth(70);
-		saveButton.setDisable(true);
 		saveButton.setOnAction(this::saveButtonClicked);
-
-		character.addListener(this::characterChanged);
+		saveButton.disableProperty().bind(dirtyBinding);
 
 		setVgap(5);
 		setHgap(5);
@@ -111,37 +139,37 @@ public class CharacterPane
 			});
 	}
 
-	private void characterChanged(
-			ObservableValue<? extends Character> observable,
-			Character oldValue,
-			Character newValue)
-	{
-		if (oldValue != null)
-		{
-			nameTextField.textProperty().unbindBidirectional(oldValue.nameProperty());
-			descriptionTextArea.textProperty().unbindBidirectional(oldValue.descriptionProperty());
-			personalityTextArea.textProperty().unbindBidirectional(oldValue.personalityProperty());
-			powersTextArea.textProperty().unbindBidirectional(oldValue.powersProperty());
-
-			saveButton.disableProperty().unbind();
-		}
-
-		nameTextField.clear();
-
-		if (newValue != null)
-		{
-			nameTextField.textProperty().bindBidirectional(newValue.nameProperty());
-			descriptionTextArea.textProperty().bindBidirectional(newValue.descriptionProperty());
-			personalityTextArea.textProperty().bindBidirectional(newValue.personalityProperty());
-			powersTextArea.textProperty().bindBidirectional(newValue.powersProperty());
-
-			saveButton.disableProperty().bind(newValue.dirtyProperty().not());
-		}
-		else
-		{
-			saveButton.setDisable(true);
-		}
-	}
+	// private void characterChanged(
+	// ObservableValue<? extends Character> observable,
+	// Character oldValue,
+	// Character newValue)
+	// {
+	// if (oldValue != null)
+	// {
+	// nameTextField.textProperty().unbindBidirectional(oldValue.nameProperty());
+	// descriptionTextArea.textProperty().unbindBidirectional(oldValue.descriptionProperty());
+	// personalityTextArea.textProperty().unbindBidirectional(oldValue.personalityProperty());
+	// powersTextArea.textProperty().unbindBidirectional(oldValue.powersProperty());
+	//
+	// saveButton.disableProperty().unbind();
+	// }
+	//
+	// nameTextField.clear();
+	//
+	// if (newValue != null)
+	// {
+	// nameTextField.textProperty().bindBidirectional(newValue.nameProperty());
+	// descriptionTextArea.textProperty().bindBidirectional(newValue.descriptionProperty());
+	// personalityTextArea.textProperty().bindBidirectional(newValue.personalityProperty());
+	// powersTextArea.textProperty().bindBidirectional(newValue.powersProperty());
+	//
+	// saveButton.disableProperty().bind(newValue.dirtyProperty().not());
+	// }
+	// else
+	// {
+	// saveButton.setDisable(true);
+	// }
+	// }
 
 	private void executeWithTransaction(Runnable action)
 	{

@@ -68,7 +68,10 @@ public class LocationOverviewPane
 
 		addButton = new Button("Add");
 		addButton.setMinWidth(70);
-		addButton.disableProperty().bind(Bindings.isNull(universe));
+		addButton.disableProperty().bind(
+			Bindings.or(
+				Bindings.isNull(universe),
+				Bindings.isNull(locationTreeView.getSelectionModel().selectedItemProperty())));
 		addButton.setOnAction(this::addButtonClicked);
 
 		removeButton = new Button("Remove");

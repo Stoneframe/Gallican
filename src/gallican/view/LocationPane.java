@@ -2,11 +2,14 @@ package gallican.view;
 
 import javax.persistence.EntityManager;
 
+import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.MonadicBinding;
+import org.fxmisc.easybind.monadic.PropertyBinding;
+
 import gallican.model.Location;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
@@ -21,6 +24,10 @@ public class LocationPane
 {
 	private final EntityManager entityManager;
 
+	private final PropertyBinding<String> nameBinding;
+	private final PropertyBinding<String> descriptionBinding;
+	private final MonadicBinding<Boolean> dirtyBinding;
+
 	private final Text title;
 
 	private final TextField nameTextField;
@@ -34,23 +41,34 @@ public class LocationPane
 	{
 		this.entityManager = entityManager;
 
+		nameBinding = EasyBind
+			.monadic(location)
+			.selectProperty(Location::nameProperty);
+		descriptionBinding = EasyBind
+			.monadic(location)
+			.selectProperty(Location::descriptionProperty);
+		dirtyBinding = EasyBind
+			.select(location)
+			.selectObject(l -> l.dirtyProperty().not())
+			.orElse(true);
+
 		title = new Text("Location");
 		title.setFont(new Font(20));
 
 		nameTextField = new TextField();
 		nameTextField.setMinWidth(200);
 		nameTextField.disableProperty().bind(Bindings.isNull(location));
+		nameTextField.textProperty().bindBidirectional(nameBinding);
 
 		descriptionTextArea = new TextArea();
 		descriptionTextArea.setWrapText(true);
 		descriptionTextArea.disableProperty().bind(Bindings.isNull(location));
+		descriptionTextArea.textProperty().bindBidirectional(descriptionBinding);
 
 		saveButton = new Button("Save");
 		saveButton.setMinWidth(70);
-		saveButton.setDisable(true);
 		saveButton.setOnAction(this::saveButtonClicked);
-
-		location.addListener(this::locationChanged);
+		saveButton.disableProperty().bind(dirtyBinding);
 
 		setVgap(5);
 		setHgap(5);
@@ -91,34 +109,6 @@ public class LocationPane
 			{
 				entityManager.persist(location.get());
 			});
-	}
-
-	private void locationChanged(
-			ObservableValue<? extends Location> observable,
-			Location oldValue,
-			Location newValue)
-	{
-		if (oldValue != null)
-		{
-			nameTextField.textProperty().unbindBidirectional(oldValue.nameProperty());
-			descriptionTextArea.textProperty().unbindBidirectional(oldValue.descriptionProperty());
-
-			saveButton.disableProperty().unbind();
-		}
-
-		nameTextField.clear();
-
-		if (newValue != null)
-		{
-			nameTextField.textProperty().bindBidirectional(newValue.nameProperty());
-			descriptionTextArea.textProperty().bindBidirectional(newValue.descriptionProperty());
-
-			saveButton.disableProperty().bind(newValue.dirtyProperty().not());
-		}
-		else
-		{
-			saveButton.setDisable(true);
-		}
 	}
 
 	private void executeWithTransaction(Runnable action)

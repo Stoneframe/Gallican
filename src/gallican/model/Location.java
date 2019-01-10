@@ -1,10 +1,12 @@
 package gallican.model;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -31,14 +33,30 @@ public class Location
 	private final StringProperty description = new SimpleStringProperty();
 
 	private final ObjectProperty<Universe> universe = new SimpleObjectProperty<>();
-
 	private final ObjectProperty<Location> location = new SimpleObjectProperty<>();
 	private final ListProperty<Location> locations = new SimpleListProperty<>(
 			FXCollections.observableArrayList());
 
+	private final ListProperty<Event> events =
+			new SimpleListProperty<>(FXCollections.observableArrayList());
+
 	public Location()
 	{
 		track(name, description);
+	}
+
+	public static List<Location> toList(Location location)
+	{
+		List<Location> list = new LinkedList<>();
+
+		list.add(location);
+
+		for (Location child : location.getLocations())
+		{
+			list.addAll(toList(child));
+		}
+
+		return list;
 	}
 
 	@Column(name = "name")
@@ -133,8 +151,7 @@ public class Location
 		return locations.get();
 	}
 
-	@SuppressWarnings("unused")
-	private void setLocations(List<Location> locations)
+	protected void setLocations(List<Location> locations)
 	{
 		this.locations.set(FXCollections.observableArrayList(locations));
 	}
@@ -142,6 +159,28 @@ public class Location
 	public ListProperty<Location> locationsProperty()
 	{
 		return locations;
+	}
+
+	public ObservableList<Event> events()
+	{
+		return events;
+	}
+
+	@OneToMany(mappedBy = "Location", orphanRemoval = true, cascade = CascadeType.ALL)
+	@JoinColumn(name = "LocationId")
+	public List<Event> getEvents()
+	{
+		return events.get();
+	}
+
+	protected void setEvents(List<Event> events)
+	{
+		this.events.set(FXCollections.observableArrayList(events));
+	}
+
+	public ListProperty<Event> eventsProperty()
+	{
+		return events;
 	}
 
 	@Override

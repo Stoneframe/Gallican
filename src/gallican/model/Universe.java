@@ -31,6 +31,9 @@ public class Universe
 	private final ListProperty<Character> characters = new SimpleListProperty<>(
 			FXCollections.observableArrayList());
 
+	private final ListProperty<Event> events = new SimpleListProperty<>(
+			FXCollections.observableArrayList());
+
 	private final ObjectProperty<Location> location = new SimpleObjectProperty<>();
 
 	public Universe()
@@ -78,8 +81,7 @@ public class Universe
 		return charactersProperty().get();
 	}
 
-	@SuppressWarnings("unused")
-	private void setCharacters(List<Character> characters)
+	protected void setCharacters(List<Character> characters)
 	{
 		charactersProperty().set(FXCollections.observableArrayList(characters));
 	}
@@ -87,6 +89,40 @@ public class Universe
 	public ListProperty<Character> charactersProperty()
 	{
 		return characters;
+	}
+
+	public ObservableList<Event> events()
+	{
+		return events;
+	}
+
+	public void addEvent(Event event)
+	{
+		getEvents().add(event);
+		event.setUniverse(this);
+	}
+
+	public void removeEvent(Event event)
+	{
+		getEvents().remove(event);
+		event.setUniverse(null);
+	}
+
+	@OneToMany(mappedBy = "Universe", orphanRemoval = true, cascade = CascadeType.ALL)
+	@JoinColumn(name = "UniverseId")
+	public List<Event> getEvents()
+	{
+		return events.get();
+	}
+
+	protected void setEvents(List<Event> events)
+	{
+		this.events.set(FXCollections.observableArrayList(events));
+	}
+
+	public ListProperty<Event> eventsProperty()
+	{
+		return events;
 	}
 
 	@OneToOne(orphanRemoval = true, cascade = CascadeType.ALL)

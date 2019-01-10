@@ -1,5 +1,6 @@
 package gallican.util;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -11,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 
@@ -71,6 +73,33 @@ public class Util
 			Consumer<ButtonType> ifPresent)
 	{
 		Optional<ButtonType> result = showConfirmationDialog(title, header, content);
+
+		result.ifPresent(ifPresent);
+	}
+
+	public static <T> Optional<T> showChoiceDialog(
+			String title,
+			String header,
+			String content,
+			List<T> choices)
+	{
+		ChoiceDialog<T> dialog = new ChoiceDialog<>(null, choices);
+
+		dialog.setTitle(title);
+		dialog.setHeaderText(header);
+		dialog.setContentText(content);
+
+		return dialog.showAndWait();
+	}
+
+	public static <T> void showChoiceDialog(
+			String title,
+			String header,
+			String content,
+			List<T> choices,
+			Consumer<T> ifPresent)
+	{
+		Optional<T> result = showChoiceDialog(title, header, content, choices);
 
 		result.ifPresent(ifPresent);
 	}

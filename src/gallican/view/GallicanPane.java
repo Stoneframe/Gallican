@@ -14,16 +14,19 @@ public class GallicanPane
 	private final UniversesPane universesPane;
 	private final CharacterOverviewPane characterOverviewPane;
 	private final LocationOverviewPane locationOverviewPane;
+	private final EventOverviewPane eventOverviewPane;
 
 	public GallicanPane(EntityManager entityManager)
 	{
 		universesPane = new UniversesPane(entityManager);
 		characterOverviewPane = new CharacterOverviewPane(entityManager);
 		locationOverviewPane = new LocationOverviewPane(entityManager);
+		eventOverviewPane = new EventOverviewPane(entityManager);
 
 		TabPane tabPane = new TabPane(
 				new Tab("Characters", characterOverviewPane),
-				new Tab("Locations", locationOverviewPane));
+				new Tab("Locations", locationOverviewPane),
+				new Tab("Events", eventOverviewPane));
 
 		tabPane.getStyleClass().add("floating");
 		tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
@@ -31,9 +34,11 @@ public class GallicanPane
 		universesPane.setPadding(new Insets(5));
 		characterOverviewPane.setPadding(new Insets(5));
 		locationOverviewPane.setPadding(new Insets(5));
+		eventOverviewPane.setPadding(new Insets(5));
 
 		characterOverviewPane.universeProperty().bind(universesPane.universeProperty());
 		locationOverviewPane.universeProperty().bind(universesPane.universeProperty());
+		eventOverviewPane.universeProperty().bind(universesPane.universeProperty());
 
 		setPadding(new Insets(10));
 

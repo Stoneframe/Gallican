@@ -119,11 +119,20 @@ public class LocationOverviewPane
 							Location location = new Location();
 							location.setName(name);
 
-							locationTreeView
+							TreeItem<Location> selectedItem = locationTreeView
 								.getSelectionModel()
-								.getSelectedItem()
-								.getValue()
-								.addLocation(location);
+								.getSelectedItem();
+
+							selectedItem.getValue().addLocation(location);
+
+							TreeItem<Location> newItem = selectedItem
+								.getChildren()
+								.stream()
+								.filter(i -> i.getValue().equals(location))
+								.findFirst()
+								.get();
+
+							locationTreeView.getSelectionModel().select(newItem);
 						});
 				});
 	}
@@ -142,6 +151,8 @@ public class LocationOverviewPane
 				if (parent != null)
 				{
 					parent.removeLocation(location);
+
+					locationTreeView.getSelectionModel().clearSelection();
 				}
 				else
 				{

@@ -95,11 +95,10 @@ public class CharacterOverviewPane
 							character.setName(name);
 
 							getUniverse().addCharacter(character);
+
+							characterListView.getSelectionModel().select(character);
 						});
-
-					characterListView.getSelectionModel().selectLast();
 				});
-
 	}
 
 	private void removeButtonClicked(ActionEvent event)

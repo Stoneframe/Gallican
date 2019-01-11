@@ -98,9 +98,11 @@ public class EventOverviewPane
 					LocalDate date = result.get().getKey();
 					String name = result.get().getValue();
 
-					Event event = new Event(date, name);
+					Event event = new Event(date, name, getUniverse().getLocation());
 
 					getUniverse().addEvent(event);
+
+					eventListView.getSelectionModel().select(event);
 				});
 		}
 	}
@@ -112,6 +114,8 @@ public class EventOverviewPane
 				Event event = eventListView.getSelectionModel().getSelectedItem();
 
 				getUniverse().removeEvent(event);
+
+				eventListView.getSelectionModel().clearSelection();
 			});
 	}
 

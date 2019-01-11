@@ -45,12 +45,13 @@ public class Event
 
 	private final ReadOnlyStringWrapper displayValue = new ReadOnlyStringWrapper();
 
-	public Event(LocalDate date, String name)
+	public Event(LocalDate date, String name, Location location)
 	{
 		this();
 
 		setDate(date);
 		setName(name);
+		setLocation(location);
 	}
 
 	Event()

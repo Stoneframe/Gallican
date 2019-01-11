@@ -165,4 +165,10 @@ public class Universe
 		return location.isDirty()
 				|| location.getLocations().stream().anyMatch(l -> isLocationDirty(l));
 	}
+
+	@Override
+	protected boolean checkIsValid()
+	{
+		return getName() != null && !getName().isEmpty();
+	}
 }

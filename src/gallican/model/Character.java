@@ -152,4 +152,10 @@ public class Character
 	{
 		return String.format("%d - Name: %s", getId(), getName());
 	}
+
+	@Override
+	protected boolean checkIsValid()
+	{
+		return getName() != null && !getName().isEmpty();
+	}
 }

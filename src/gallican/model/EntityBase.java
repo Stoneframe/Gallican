@@ -1,7 +1,5 @@
 package gallican.model;
 
-import java.util.Arrays;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -14,6 +12,8 @@ import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.Transient;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -28,15 +28,24 @@ public abstract class EntityBase
 {
 	private final LongProperty id = new SimpleLongProperty();
 
+	private final ReadOnlyBooleanWrapper valid = new ReadOnlyBooleanWrapper(false);
 	private final ReadOnlyBooleanWrapper dirty = new ReadOnlyBooleanWrapper(false);
 
 	private Property<?>[] properties;
 	private int prevHashStatus;
 
+	private BooleanBinding validBinding;
+	private BooleanBinding dirtyBinding;
+
 	protected void track(Property<?>... properties)
 	{
 		this.properties = properties;
-		Arrays.stream(properties).forEach(p -> p.addListener(o -> updateDirty()));
+
+		validBinding = Bindings.createBooleanBinding(this::checkIsValid, properties);
+		dirtyBinding = Bindings.createBooleanBinding(this::checkIsDirty, properties);
+
+		valid.bind(validBinding);
+		dirty.bind(dirtyBinding);
 	}
 
 	@Id
@@ -58,6 +67,17 @@ public abstract class EntityBase
 	}
 
 	@Transient
+	public boolean isValid()
+	{
+		return valid.get();
+	}
+
+	public ReadOnlyBooleanProperty validProperty()
+	{
+		return valid.getReadOnlyProperty();
+	}
+
+	@Transient
 	public boolean isDirty()
 	{
 		return dirty.get();
@@ -74,12 +94,16 @@ public abstract class EntityBase
 	public void reset()
 	{
 		prevHashStatus = calculateHashStatus();
-		updateDirty();
+
+		if (validBinding != null) validBinding.invalidate();
+		if (dirtyBinding != null) dirtyBinding.invalidate();
 	}
 
-	private void updateDirty()
+	protected abstract boolean checkIsValid();
+
+	private boolean checkIsDirty()
 	{
-		this.dirty.set(prevHashStatus != calculateHashStatus());
+		return prevHashStatus != calculateHashStatus();
 	}
 
 	private int calculateHashStatus()

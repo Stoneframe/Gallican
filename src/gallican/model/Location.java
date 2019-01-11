@@ -204,4 +204,10 @@ public class Location
 	{
 		return getName();
 	}
+
+	@Override
+	protected boolean checkIsValid()
+	{
+		return getName() != null && !getName().isEmpty();
+	}
 }

@@ -30,8 +30,7 @@ public class Event
 	extends EntityBase
 	implements
 		Named,
-		Displayable,
-		Comparable<Event>
+		Displayable
 {
 	private final ObjectProperty<LocalDate> date = new SimpleObjectProperty<>();
 	private final StringProperty name = new SimpleStringProperty();
@@ -205,8 +204,12 @@ public class Event
 	}
 
 	@Override
-	public int compareTo(Event other)
+	protected boolean checkIsValid()
 	{
-		return this.getDate().compareTo(other.getDate());
+		return (getDate() != null)
+				&&
+				(getName() != null && !getName().isEmpty())
+				&&
+				(getLocation() != null);
 	}
 }

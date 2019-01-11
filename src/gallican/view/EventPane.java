@@ -16,6 +16,7 @@ import gallican.model.Location;
 import gallican.model.Universe;
 import gallican.util.Util;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -43,7 +44,10 @@ public class EventPane
 	private final PropertyBinding<String> descriptionBinding;
 	private final MonadicBinding<String> locationBinding;
 	private final MonadicBinding<ObservableList<Character>> charactersBinding;
+	private final MonadicBinding<Boolean> validBinding;
 	private final MonadicBinding<Boolean> dirtyBinding;
+
+	private final BooleanBinding saveBinding;
 
 	private final Text title;
 
@@ -83,10 +87,21 @@ public class EventPane
 		charactersBinding = EasyBind
 			.select(event)
 			.selectObject(Event::charactersProperty);
+		validBinding = EasyBind
+			.select(event)
+			.selectObject(c -> c.validProperty())
+			.orElse(false);
 		dirtyBinding = EasyBind
 			.select(event)
-			.selectObject(e -> e.dirtyProperty().not())
-			.orElse(true);
+			.selectObject(e -> e.dirtyProperty())
+			.orElse(false);
+
+		saveBinding = Bindings
+			.createBooleanBinding(
+				() -> validBinding.get() && dirtyBinding.get(),
+				validBinding,
+				dirtyBinding)
+			.not();
 
 		title = new Text("Event");
 		title.setFont(new Font(20));
@@ -141,7 +156,7 @@ public class EventPane
 		saveButton = new Button("Save");
 		saveButton.setMinWidth(70);
 		saveButton.setOnAction(this::saveButtonClicked);
-		saveButton.disableProperty().bind(dirtyBinding);
+		saveButton.disableProperty().bind(saveBinding);
 
 		setVgap(5);
 		setHgap(5);

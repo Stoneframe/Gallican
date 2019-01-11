@@ -9,6 +9,7 @@ import org.fxmisc.easybind.monadic.PropertyBinding;
 import gallican.model.Character;
 import gallican.model.Event;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -31,8 +32,11 @@ public class CharacterPane
 	private final PropertyBinding<String> descriptionBinding;
 	private final PropertyBinding<String> personalityBinding;
 	private final PropertyBinding<String> powersBinding;
+	private final MonadicBinding<Boolean> validBinding;
 	private final MonadicBinding<Boolean> dirtyBinding;
 	private final MonadicBinding<ObservableList<Event>> eventsBinding;
+
+	private final BooleanBinding saveBinding;
 
 	private final Text title;
 
@@ -63,13 +67,24 @@ public class CharacterPane
 		powersBinding = EasyBind
 			.monadic(character)
 			.selectProperty(Character::powersProperty);
+		validBinding = EasyBind
+			.select(character)
+			.selectObject(c -> c.validProperty())
+			.orElse(false);
 		dirtyBinding = EasyBind
 			.select(character)
-			.selectObject(c -> c.dirtyProperty().not())
-			.orElse(true);
+			.selectObject(c -> c.dirtyProperty())
+			.orElse(false);
 		eventsBinding = EasyBind
 			.select(character)
 			.selectObject(Character::eventsProperty);
+
+		saveBinding = Bindings
+			.createBooleanBinding(
+				() -> validBinding.get() && dirtyBinding.get(),
+				validBinding,
+				dirtyBinding)
+			.not();
 
 		title = new Text("Character");
 		title.setFont(new Font(20));
@@ -98,7 +113,7 @@ public class CharacterPane
 		saveButton = new Button("Save");
 		saveButton.setMinWidth(70);
 		saveButton.setOnAction(this::saveButtonClicked);
-		saveButton.disableProperty().bind(dirtyBinding);
+		saveButton.disableProperty().bind(saveBinding);
 
 		eventListView = new ListView<>();
 		eventListView.setCellFactory(lc -> new DisplayValueListCell<>());
@@ -160,38 +175,6 @@ public class CharacterPane
 				entityManager.persist(character.get());
 			});
 	}
-
-	// private void characterChanged(
-	// ObservableValue<? extends Character> observable,
-	// Character oldValue,
-	// Character newValue)
-	// {
-	// if (oldValue != null)
-	// {
-	// nameTextField.textProperty().unbindBidirectional(oldValue.nameProperty());
-	// descriptionTextArea.textProperty().unbindBidirectional(oldValue.descriptionProperty());
-	// personalityTextArea.textProperty().unbindBidirectional(oldValue.personalityProperty());
-	// powersTextArea.textProperty().unbindBidirectional(oldValue.powersProperty());
-	//
-	// saveButton.disableProperty().unbind();
-	// }
-	//
-	// nameTextField.clear();
-	//
-	// if (newValue != null)
-	// {
-	// nameTextField.textProperty().bindBidirectional(newValue.nameProperty());
-	// descriptionTextArea.textProperty().bindBidirectional(newValue.descriptionProperty());
-	// personalityTextArea.textProperty().bindBidirectional(newValue.personalityProperty());
-	// powersTextArea.textProperty().bindBidirectional(newValue.powersProperty());
-	//
-	// saveButton.disableProperty().bind(newValue.dirtyProperty().not());
-	// }
-	// else
-	// {
-	// saveButton.setDisable(true);
-	// }
-	// }
 
 	private void executeWithTransaction(Runnable action)
 	{

@@ -9,6 +9,7 @@ import org.fxmisc.easybind.monadic.PropertyBinding;
 import gallican.model.Event;
 import gallican.model.Location;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -30,7 +31,10 @@ public class LocationPane
 	private final PropertyBinding<String> nameBinding;
 	private final PropertyBinding<String> descriptionBinding;
 	private final MonadicBinding<Boolean> dirtyBinding;
+	private final MonadicBinding<Boolean> validBinding;
 	private final MonadicBinding<ObservableList<Event>> eventsBinding;
+
+	private final BooleanBinding saveBinding;
 
 	private final Text title;
 
@@ -53,13 +57,24 @@ public class LocationPane
 		descriptionBinding = EasyBind
 			.monadic(location)
 			.selectProperty(Location::descriptionProperty);
+		validBinding = EasyBind
+			.select(location)
+			.selectObject(c -> c.validProperty())
+			.orElse(false);
 		dirtyBinding = EasyBind
 			.select(location)
-			.selectObject(l -> l.dirtyProperty().not())
-			.orElse(true);
+			.selectObject(e -> e.dirtyProperty())
+			.orElse(false);
 		eventsBinding = EasyBind
 			.select(location)
 			.selectObject(Location::eventsProperty);
+
+		saveBinding = Bindings
+			.createBooleanBinding(
+				() -> validBinding.get() && dirtyBinding.get(),
+				validBinding,
+				dirtyBinding)
+			.not();
 
 		title = new Text("Location");
 		title.setFont(new Font(20));
@@ -78,7 +93,7 @@ public class LocationPane
 		saveButton = new Button("Save");
 		saveButton.setMinWidth(70);
 		saveButton.setOnAction(this::saveButtonClicked);
-		saveButton.disableProperty().bind(dirtyBinding);
+		saveButton.disableProperty().bind(saveBinding);
 
 		eventListView = new ListView<>();
 		eventListView.setCellFactory(lc -> new DisplayValueListCell<>());

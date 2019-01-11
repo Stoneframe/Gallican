@@ -10,16 +10,18 @@ import java.util.stream.Collectors;
 import gallican.database.upgrade.DatabaseUpgrade;
 import gallican.database.upgrade.DatabaseUpgrade2;
 import gallican.database.upgrade.DatabaseUpgrade3;
+import gallican.database.upgrade.DatabaseUpgrade4;
 
 public class DatabaseManager
 {
-	private static final int CURRENT_VERSION = 3;
+	private static final int CURRENT_VERSION = 4;
 
 	private final String javaxPersistenceJdbcUrl;
 
 	private final List<DatabaseUpgrade> upgrades = Arrays.asList(
 		new DatabaseUpgrade2(),
-		new DatabaseUpgrade3());
+		new DatabaseUpgrade3(),
+		new DatabaseUpgrade4());
 
 	private ApplicationInfo applicationInfo;
 

@@ -2,6 +2,7 @@ package gallican.view;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 
@@ -101,6 +102,7 @@ public class EventPane
 		nameTextField.textProperty().bindBidirectional(nameBinding);
 
 		descriptionTextArea = new TextArea();
+		descriptionTextArea.setMinHeight(300);
 		descriptionTextArea.setWrapText(true);
 		descriptionTextArea.disableProperty().bind(Bindings.isNull(event));
 		descriptionTextArea.textProperty().bindBidirectional(descriptionBinding);
@@ -111,16 +113,19 @@ public class EventPane
 		locationTextField.textProperty().bind(locationBinding);
 
 		characterListView = new ListView<>();
+		characterListView.setMaxHeight(200);
 		characterListView.setCellFactory(lc -> new NameListCell<>());
 		characterListView.disableProperty().bind(Bindings.isNull(event));
 		characterListView.itemsProperty().bind(charactersBinding);
 
 		addCharacterButton = new Button("Add");
 		addCharacterButton.setMinWidth(50);
+		addCharacterButton.setOnAction(this::addCharacterButtonClicked);
 		addCharacterButton.disableProperty().bind(Bindings.isNull(event));
 
 		removeCharacterButton = new Button("Remove");
 		removeCharacterButton.setMinWidth(50);
+		removeCharacterButton.setOnAction(this::removeCharacterButtonClicked);
 		removeCharacterButton.disableProperty().bind(
 			Bindings.or(
 				Bindings.isNull(event),
@@ -206,21 +211,47 @@ public class EventPane
 			});
 	}
 
-	private void locationTextFieldClicked(MouseEvent event)
+	private void locationTextFieldClicked(MouseEvent e)
 	{
 		if (locationTextField.isDisabled()) return;
 
 		List<Location> locations = Location.toList(getUniverse().getLocation());
 
-		Util.showChoiceDialog(
+		Util.showNamedChoiceDialog(
 			"Location",
 			"Choose location for event.",
 			"Select location:",
 			locations,
 			location ->
 				{
-					getEvent().setLocation(location);
+					getEvent().assignToLocation(location);
 				});
+	}
+
+	private void addCharacterButtonClicked(ActionEvent e)
+	{
+		List<Character> characters = getUniverse()
+			.getCharacters()
+			.stream()
+			.filter(c -> !getEvent().characters().contains(c))
+			.collect(Collectors.toList());
+
+		Util.showNamedChoiceDialog(
+			"Character",
+			"Add character to event.",
+			"Select character:",
+			characters,
+			character ->
+				{
+					getEvent().addCharacter(character);
+				});
+	}
+
+	private void removeCharacterButtonClicked(ActionEvent e)
+	{
+		Character character = characterListView.getSelectionModel().getSelectedItem();
+
+		getEvent().removeCharacter(character);
 	}
 
 	private void executeWithTransaction(Runnable action)

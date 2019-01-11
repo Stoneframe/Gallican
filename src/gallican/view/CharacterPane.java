@@ -7,12 +7,15 @@ import org.fxmisc.easybind.monadic.MonadicBinding;
 import org.fxmisc.easybind.monadic.PropertyBinding;
 
 import gallican.model.Character;
+import gallican.model.Event;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -29,6 +32,7 @@ public class CharacterPane
 	private final PropertyBinding<String> personalityBinding;
 	private final PropertyBinding<String> powersBinding;
 	private final MonadicBinding<Boolean> dirtyBinding;
+	private final MonadicBinding<ObservableList<Event>> eventsBinding;
 
 	private final Text title;
 
@@ -38,6 +42,8 @@ public class CharacterPane
 	private final TextArea powersTextArea;
 
 	private final Button saveButton;
+
+	private final ListView<Event> eventListView;
 
 	private final ObjectProperty<Character> character = new SimpleObjectProperty<>();
 
@@ -61,6 +67,9 @@ public class CharacterPane
 			.select(character)
 			.selectObject(c -> c.dirtyProperty().not())
 			.orElse(true);
+		eventsBinding = EasyBind
+			.select(character)
+			.selectObject(Character::eventsProperty);
 
 		title = new Text("Character");
 		title.setFont(new Font(20));
@@ -71,6 +80,7 @@ public class CharacterPane
 		nameTextField.textProperty().bindBidirectional(nameBinding);
 
 		descriptionTextArea = new TextArea();
+		descriptionTextArea.setMinHeight(300);
 		descriptionTextArea.setWrapText(true);
 		descriptionTextArea.disableProperty().bind(Bindings.isNull(character));
 		descriptionTextArea.textProperty().bindBidirectional(descriptionBinding);
@@ -90,12 +100,18 @@ public class CharacterPane
 		saveButton.setOnAction(this::saveButtonClicked);
 		saveButton.disableProperty().bind(dirtyBinding);
 
+		eventListView = new ListView<>();
+		eventListView.setCellFactory(lc -> new DisplayValueListCell<>());
+		eventListView.disableProperty().bind(Bindings.isNull(character));
+		eventListView.itemsProperty().bind(eventsBinding);
+
 		setVgap(5);
 		setHgap(5);
 
 		GridPane.setColumnSpan(descriptionTextArea, 2);
 		GridPane.setColumnSpan(personalityTextArea, 2);
 		GridPane.setColumnSpan(powersTextArea, 2);
+		GridPane.setRowSpan(eventListView, 7);
 
 		add(title, 0, 0);
 
@@ -112,6 +128,12 @@ public class CharacterPane
 		add(powersTextArea, 0, 10);
 
 		add(saveButton, 1, 12);
+
+		Text historyText = new Text("History:");
+		historyText.setFont(new Font(20));
+
+		add(historyText, 3, 0);
+		add(eventListView, 3, 1);
 
 		setHalignment(saveButton, HPos.RIGHT);
 	}

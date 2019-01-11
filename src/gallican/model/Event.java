@@ -12,8 +12,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -26,7 +29,9 @@ import javafx.collections.ObservableList;
 public class Event
 	extends EntityBase
 	implements
-		Named
+		Named,
+		Displayable,
+		Comparable<Event>
 {
 	private final ObjectProperty<LocalDate> date = new SimpleObjectProperty<>();
 	private final StringProperty name = new SimpleStringProperty();
@@ -39,9 +44,22 @@ public class Event
 	private final ListProperty<Character> characters = new SimpleListProperty<>(
 			FXCollections.observableArrayList());
 
-	public Event()
+	private final ReadOnlyStringWrapper displayValue = new ReadOnlyStringWrapper();
+
+	public Event(LocalDate date, String name)
 	{
-		track(date, name, description, location);
+		this();
+
+		setDate(date);
+		setName(name);
+	}
+
+	Event()
+	{
+		track(date, name, description, location, characters);
+
+		displayValue.bind(
+			Bindings.createStringBinding(() -> getDate() + " - " + getName(), date, name));
 	}
 
 	@Column(name = "Date")
@@ -77,6 +95,18 @@ public class Event
 	public StringProperty nameProperty()
 	{
 		return name;
+	}
+
+	@Override
+	public String getDisplayValue()
+	{
+		return displayValue.get();
+	}
+
+	@Override
+	public ReadOnlyStringProperty displayValueProperty()
+	{
+		return displayValue.getReadOnlyProperty();
 	}
 
 	@Column(name = "description")
@@ -138,7 +168,7 @@ public class Event
 		return characters.get();
 	}
 
-	protected void setCharacters(List<Character> characters)
+	void setCharacters(List<Character> characters)
 	{
 		this.characters.set(FXCollections.observableArrayList(characters));
 	}
@@ -154,13 +184,29 @@ public class Event
 		return location.get();
 	}
 
-	public void setLocation(Location location)
+	void setLocation(Location location)
 	{
 		this.location.set(location);
+	}
+
+	public void assignToLocation(Location location)
+	{
+		if (this.getLocation() != null)
+		{
+			this.getLocation().removeEvent(this);
+		}
+
+		location.addEvent(this);
 	}
 
 	public ObjectProperty<Location> locationProperty()
 	{
 		return location;
+	}
+
+	@Override
+	public int compareTo(Event other)
+	{
+		return this.getDate().compareTo(other.getDate());
 	}
 }

@@ -21,6 +21,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 
 @Entity
 @Table(name = "Locations")
@@ -37,8 +38,11 @@ public class Location
 	private final ListProperty<Location> locations = new SimpleListProperty<>(
 			FXCollections.observableArrayList());
 
-	private final ListProperty<Event> events =
-			new SimpleListProperty<>(FXCollections.observableArrayList());
+	private final ObservableList<Event> events = FXCollections.observableArrayList();
+	private final SortedList<Event> sortedEvents = new SortedList<>(
+			events,
+			(a, b) -> a.getDate().compareTo(b.getDate()));
+	private final ListProperty<Event> eventsProperty = new SimpleListProperty<>(sortedEvents);
 
 	public Location()
 	{
@@ -144,7 +148,7 @@ public class Location
 		location.setLocation(null);
 	}
 
-	@OneToMany(mappedBy = "Location", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "Location", cascade = CascadeType.ALL, orphanRemoval = true)
 	@PrimaryKeyJoinColumn
 	public List<Location> getLocations()
 	{
@@ -163,24 +167,36 @@ public class Location
 
 	public ObservableList<Event> events()
 	{
+		return sortedEvents;
+	}
+
+	public void addEvent(Event event)
+	{
+		event.setLocation(this);
+		events.add(event);
+	}
+
+	public void removeEvent(Event event)
+	{
+		events.remove(event);
+		event.setLocation(null);
+	}
+
+	@OneToMany(mappedBy = "Location", cascade = CascadeType.ALL)
+	@JoinColumn(name = "LocationId")
+	List<Event> getEvents()
+	{
 		return events;
 	}
 
-	@OneToMany(mappedBy = "Location", orphanRemoval = true, cascade = CascadeType.ALL)
-	@JoinColumn(name = "LocationId")
-	public List<Event> getEvents()
+	void setEvents(List<Event> events)
 	{
-		return events.get();
-	}
-
-	protected void setEvents(List<Event> events)
-	{
-		this.events.set(FXCollections.observableArrayList(events));
+		this.events.setAll(events);
 	}
 
 	public ListProperty<Event> eventsProperty()
 	{
-		return events;
+		return eventsProperty;
 	}
 
 	@Override

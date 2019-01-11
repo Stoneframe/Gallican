@@ -6,13 +6,16 @@ import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.monadic.MonadicBinding;
 import org.fxmisc.easybind.monadic.PropertyBinding;
 
+import gallican.model.Event;
 import gallican.model.Location;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -27,6 +30,7 @@ public class LocationPane
 	private final PropertyBinding<String> nameBinding;
 	private final PropertyBinding<String> descriptionBinding;
 	private final MonadicBinding<Boolean> dirtyBinding;
+	private final MonadicBinding<ObservableList<Event>> eventsBinding;
 
 	private final Text title;
 
@@ -34,6 +38,8 @@ public class LocationPane
 	private final TextArea descriptionTextArea;
 
 	private final Button saveButton;
+
+	private final ListView<Event> eventListView;
 
 	private final ObjectProperty<Location> location = new SimpleObjectProperty<>();
 
@@ -51,6 +57,9 @@ public class LocationPane
 			.select(location)
 			.selectObject(l -> l.dirtyProperty().not())
 			.orElse(true);
+		eventsBinding = EasyBind
+			.select(location)
+			.selectObject(Location::eventsProperty);
 
 		title = new Text("Location");
 		title.setFont(new Font(20));
@@ -61,6 +70,7 @@ public class LocationPane
 		nameTextField.textProperty().bindBidirectional(nameBinding);
 
 		descriptionTextArea = new TextArea();
+		descriptionTextArea.setMinHeight(300);
 		descriptionTextArea.setWrapText(true);
 		descriptionTextArea.disableProperty().bind(Bindings.isNull(location));
 		descriptionTextArea.textProperty().bindBidirectional(descriptionBinding);
@@ -70,10 +80,16 @@ public class LocationPane
 		saveButton.setOnAction(this::saveButtonClicked);
 		saveButton.disableProperty().bind(dirtyBinding);
 
+		eventListView = new ListView<>();
+		eventListView.setCellFactory(lc -> new DisplayValueListCell<>());
+		eventListView.disableProperty().bind(Bindings.isNull(location));
+		eventListView.itemsProperty().bind(eventsBinding);
+
 		setVgap(5);
 		setHgap(5);
 
 		GridPane.setColumnSpan(descriptionTextArea, 2);
+		GridPane.setRowSpan(eventListView, 7);
 
 		add(title, 0, 0);
 
@@ -84,6 +100,12 @@ public class LocationPane
 		add(descriptionTextArea, 0, 4);
 
 		add(saveButton, 1, 6);
+
+		Text historyText = new Text("History:");
+		historyText.setFont(new Font(20));
+
+		add(historyText, 3, 0);
+		add(eventListView, 3, 1);
 
 		setHalignment(saveButton, HPos.RIGHT);
 	}

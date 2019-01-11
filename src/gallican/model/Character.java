@@ -16,6 +16,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 
 @Entity
 @Table(name = "Characters")
@@ -31,8 +32,11 @@ public class Character
 
 	private final ObjectProperty<Universe> universe = new SimpleObjectProperty<>();
 
-	private final ListProperty<Event> events = new SimpleListProperty<>(
-			FXCollections.observableArrayList());
+	private final ObservableList<Event> events = FXCollections.observableArrayList();
+	private final SortedList<Event> sortedEvents = new SortedList<>(
+			events,
+			(a, b) -> a.getDate().compareTo(b.getDate()));
+	private final ListProperty<Event> eventsProperty = new SimpleListProperty<>(sortedEvents);
 
 	public Character()
 	{
@@ -124,23 +128,23 @@ public class Character
 
 	public ObservableList<Event> events()
 	{
-		return events;
+		return sortedEvents;
 	}
 
 	@ManyToMany(mappedBy = "Characters")
 	public List<Event> getEvents()
 	{
-		return events.get();
+		return events;
 	}
 
 	protected void setEvents(List<Event> events)
 	{
-		this.events.set(FXCollections.observableArrayList(events));
+		this.events.setAll(events);
 	}
 
 	public ListProperty<Event> eventsProperty()
 	{
-		return events;
+		return eventsProperty;
 	}
 
 	@Override

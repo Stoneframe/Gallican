@@ -5,6 +5,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import gallican.model.Dirtyable;
+import gallican.model.Named;
+import gallican.view.NameListCell;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -13,6 +16,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 
@@ -100,6 +104,38 @@ public class Util
 			Consumer<T> ifPresent)
 	{
 		Optional<T> result = showChoiceDialog(title, header, content, choices);
+
+		result.ifPresent(ifPresent);
+	}
+
+	public static <T extends Named & Dirtyable> Optional<T> showNamedChoiceDialog(
+			String title,
+			String header,
+			String content,
+			List<T> choices)
+	{
+		ChoiceDialog<T> dialog = new ChoiceDialog<>(null, choices);
+
+		@SuppressWarnings("unchecked")
+		ComboBox<T> comboBox = (ComboBox<T>)dialog.getDialogPane().lookup(".combo-box");
+		comboBox.setButtonCell(new NameListCell<>());
+		comboBox.setCellFactory(lc -> new NameListCell<>());
+
+		dialog.setTitle(title);
+		dialog.setHeaderText(header);
+		dialog.setContentText(content);
+
+		return dialog.showAndWait();
+	}
+
+	public static <T extends Named & Dirtyable> void showNamedChoiceDialog(
+			String title,
+			String header,
+			String content,
+			List<T> choices,
+			Consumer<T> ifPresent)
+	{
+		Optional<T> result = showNamedChoiceDialog(title, header, content, choices);
 
 		result.ifPresent(ifPresent);
 	}

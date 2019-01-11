@@ -1,5 +1,8 @@
 package gallican.view;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
 import javax.persistence.EntityManager;
 
 import gallican.model.Event;
@@ -14,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.util.Pair;
 
 public class EventOverviewPane
 	extends BorderPane
@@ -35,7 +39,7 @@ public class EventOverviewPane
 		this.entityManager = entityManager;
 
 		eventListView = new ListView<>();
-		eventListView.setCellFactory(lc -> new NameListCell<>());
+		eventListView.setCellFactory(lc -> new DisplayValueListCell<>());
 		eventListView.itemsProperty().bind(
 			Util.createNestedPropertyBinding(universe, Universe::events));
 
@@ -83,20 +87,22 @@ public class EventOverviewPane
 
 	private void addButtonClicked(ActionEvent e)
 	{
-		Util.showTextInputDialog(
-			"Create New Event",
-			"Name of new event",
-			"Name:",
-			(name) ->
-				{
-					executeWithTransaction(() ->
-						{
-							Event event = new Event();
-							event.setName(name);
+		AddEventDialog dialog = new AddEventDialog();
 
-							getUniverse().addEvent(event);
-						});
+		Optional<Pair<LocalDate, String>> result = dialog.showAndWait();
+
+		if (result.isPresent())
+		{
+			executeWithTransaction(() ->
+				{
+					LocalDate date = result.get().getKey();
+					String name = result.get().getValue();
+
+					Event event = new Event(date, name);
+
+					getUniverse().addEvent(event);
 				});
+		}
 	}
 
 	private void removeButtonClicked(ActionEvent e)

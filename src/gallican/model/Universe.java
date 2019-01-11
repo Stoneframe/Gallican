@@ -18,6 +18,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 
 @Entity
 @Table(name = "Universes")
@@ -31,8 +32,10 @@ public class Universe
 	private final ListProperty<Character> characters = new SimpleListProperty<>(
 			FXCollections.observableArrayList());
 
-	private final ListProperty<Event> events = new SimpleListProperty<>(
-			FXCollections.observableArrayList());
+	private final ObservableList<Event> events = FXCollections.observableArrayList();
+	private final SortedList<Event> sortedEvents = new SortedList<>(
+			events,
+			(a, b) -> a.getDate().compareTo(b.getDate()));
 
 	private final ObjectProperty<Location> location = new SimpleObjectProperty<>();
 
@@ -93,36 +96,31 @@ public class Universe
 
 	public ObservableList<Event> events()
 	{
-		return events;
+		return sortedEvents;
 	}
 
 	public void addEvent(Event event)
 	{
-		getEvents().add(event);
+		events.add(event);
 		event.setUniverse(this);
 	}
 
 	public void removeEvent(Event event)
 	{
-		getEvents().remove(event);
+		events.remove(event);
 		event.setUniverse(null);
 	}
 
 	@OneToMany(mappedBy = "Universe", orphanRemoval = true, cascade = CascadeType.ALL)
 	@JoinColumn(name = "UniverseId")
-	public List<Event> getEvents()
-	{
-		return events.get();
-	}
-
-	protected void setEvents(List<Event> events)
-	{
-		this.events.set(FXCollections.observableArrayList(events));
-	}
-
-	public ListProperty<Event> eventsProperty()
+	List<Event> getEvents()
 	{
 		return events;
+	}
+
+	void setEvents(List<Event> events)
+	{
+		this.events.setAll(events);
 	}
 
 	@OneToOne(orphanRemoval = true, cascade = CascadeType.ALL)

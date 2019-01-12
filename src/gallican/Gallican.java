@@ -53,6 +53,7 @@ public class Gallican
 		stage.setTitle("Gallican");
 		stage.setScene(scene);
 		stage.sizeToScene();
+		stage.setResizable(false);
 		stage.show();
 	}
 

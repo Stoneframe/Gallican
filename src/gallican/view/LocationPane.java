@@ -85,7 +85,7 @@ public class LocationPane
 		nameTextField.textProperty().bindBidirectional(nameBinding);
 
 		descriptionTextArea = new TextArea();
-		descriptionTextArea.setMinHeight(300);
+		descriptionTextArea.setMinHeight(724);
 		descriptionTextArea.setWrapText(true);
 		descriptionTextArea.disableProperty().bind(Bindings.isNull(location));
 		descriptionTextArea.textProperty().bindBidirectional(descriptionBinding);
@@ -105,7 +105,7 @@ public class LocationPane
 		setHgap(5);
 
 		GridPane.setColumnSpan(descriptionTextArea, 2);
-		GridPane.setRowSpan(eventListView, 7);
+		GridPane.setRowSpan(eventListView, 6);
 
 		add(title, 0, 0);
 

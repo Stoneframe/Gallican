@@ -81,6 +81,17 @@ public class Util
 		result.ifPresent(ifPresent);
 	}
 
+	public static void showErrorDialog(String title, String header, String content)
+	{
+		Alert warningDialog = new Alert(AlertType.ERROR);
+
+		warningDialog.setTitle(title);
+		warningDialog.setHeaderText(header);
+		warningDialog.setContentText(content);
+
+		warningDialog.show();
+	}
+
 	public static <T> Optional<T> showChoiceDialog(
 			String title,
 			String header,

@@ -54,5 +54,7 @@ public class AddEventDialog
 
 				return null;
 			});
+
+		name.requestFocus();
 	}
 }

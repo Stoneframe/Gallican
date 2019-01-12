@@ -6,7 +6,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -44,7 +43,14 @@ public class Location
 			(a, b) -> a.getDate().compareTo(b.getDate()));
 	private final ListProperty<Event> eventsProperty = new SimpleListProperty<>(sortedEvents);
 
-	public Location()
+	public Location(String name)
+	{
+		this();
+
+		setName(name);
+	}
+
+	private Location()
 	{
 		track(name, description);
 	}
@@ -63,7 +69,7 @@ public class Location
 		return list;
 	}
 
-	@Column(name = "name")
+	@Column(name = "name", nullable = false)
 	@Override
 	public String getName()
 	{
@@ -155,7 +161,7 @@ public class Location
 		return locations.get();
 	}
 
-	protected void setLocations(List<Location> locations)
+	void setLocations(List<Location> locations)
 	{
 		this.locations.set(FXCollections.observableArrayList(locations));
 	}
@@ -179,11 +185,9 @@ public class Location
 	public void removeEvent(Event event)
 	{
 		events.remove(event);
-		event.setLocation(null);
 	}
 
 	@OneToMany(mappedBy = "Location", cascade = CascadeType.ALL)
-	@JoinColumn(name = "LocationId")
 	List<Event> getEvents()
 	{
 		return events;
@@ -192,6 +196,13 @@ public class Location
 	void setEvents(List<Event> events)
 	{
 		this.events.setAll(events);
+	}
+
+	public boolean hasEvents()
+	{
+		List<Location> locations = toList(this);
+
+		return locations.stream().anyMatch(l -> !l.events().isEmpty());
 	}
 
 	public ListProperty<Event> eventsProperty()
@@ -203,6 +214,12 @@ public class Location
 	public String toString()
 	{
 		return getName();
+	}
+
+	@Override
+	public void dispose()
+	{
+
 	}
 
 	@Override

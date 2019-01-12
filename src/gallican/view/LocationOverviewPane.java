@@ -116,8 +116,7 @@ public class LocationOverviewPane
 				{
 					executeWithTransaction(() ->
 						{
-							Location location = new Location();
-							location.setName(name);
+							Location location = new Location(name);
 
 							TreeItem<Location> selectedItem = locationTreeView
 								.getSelectionModel()
@@ -148,15 +147,27 @@ public class LocationOverviewPane
 
 				Location parent = location.getLocation();
 
-				if (parent != null)
+				if (parent == null)
+				{
+					Util.showErrorDialog(
+						"Error!",
+						"Removal of Root Location",
+						"You cannot remove the Root Location.");
+				}
+				else if (location.hasEvents())
+				{
+					Util.showErrorDialog(
+						"Error!",
+						"Removal of Location with Events",
+						"You cannot remove this Location whilst it has Events associated with it."
+								+ " The Events are either directly associated to this Location, or one of its descendants."
+								+ " First either remove the events, or move them to another location.");
+				}
+				else
 				{
 					parent.removeLocation(location);
 
 					locationTreeView.getSelectionModel().clearSelection();
-				}
-				else
-				{
-					System.out.println("Cannot delete root node");
 				}
 			});
 	}

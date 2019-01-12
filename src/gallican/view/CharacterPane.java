@@ -116,6 +116,7 @@ public class CharacterPane
 		saveButton.disableProperty().bind(saveBinding);
 
 		eventListView = new ListView<>();
+		eventListView.setMinWidth(400);
 		eventListView.setCellFactory(lc -> new DisplayValueListCell<>());
 		eventListView.disableProperty().bind(Bindings.isNull(character));
 		eventListView.itemsProperty().bind(eventsBinding);
@@ -126,7 +127,7 @@ public class CharacterPane
 		GridPane.setColumnSpan(descriptionTextArea, 2);
 		GridPane.setColumnSpan(personalityTextArea, 2);
 		GridPane.setColumnSpan(powersTextArea, 2);
-		GridPane.setRowSpan(eventListView, 7);
+		GridPane.setRowSpan(eventListView, 12);
 
 		add(title, 0, 0);
 

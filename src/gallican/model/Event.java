@@ -1,6 +1,7 @@
 package gallican.model;
 
 import java.time.LocalDate;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -51,10 +52,10 @@ public class Event
 
 		setDate(date);
 		setName(name);
-		setLocation(location);
+		assignToLocation(location);
 	}
 
-	Event()
+	private Event()
 	{
 		track(date, name, description, location, characters);
 
@@ -62,7 +63,7 @@ public class Event
 			Bindings.createStringBinding(() -> getDate() + " - " + getName(), date, name));
 	}
 
-	@Column(name = "Date")
+	@Column(name = "Date", nullable = false)
 	public LocalDate getDate()
 	{
 		return date.get();
@@ -78,7 +79,7 @@ public class Event
 		return date;
 	}
 
-	@Column(name = "name")
+	@Column(name = "name", nullable = false)
 	@Override
 	public String getName()
 	{
@@ -126,6 +127,7 @@ public class Event
 	}
 
 	@ManyToOne
+	@JoinColumn(name = "Universe_Id", nullable = false)
 	public Universe getUniverse()
 	{
 		return universeProperty().get();
@@ -163,7 +165,7 @@ public class Event
 			name = "EventCharacterMappings",
 			joinColumns = @JoinColumn(name = "EventId"),
 			inverseJoinColumns = @JoinColumn(name = "CharacterId"))
-	public List<Character> getCharacters()
+	List<Character> getCharacters()
 	{
 		return characters.get();
 	}
@@ -179,6 +181,7 @@ public class Event
 	}
 
 	@ManyToOne
+	@JoinColumn(name = "Location_Id", nullable = false)
 	public Location getLocation()
 	{
 		return location.get();
@@ -202,6 +205,13 @@ public class Event
 	public ObjectProperty<Location> locationProperty()
 	{
 		return location;
+	}
+
+	@Override
+	public void dispose()
+	{
+		getLocation().removeEvent(this);
+		new LinkedList<>(getCharacters()).forEach(c -> removeCharacter(c));
 	}
 
 	@Override

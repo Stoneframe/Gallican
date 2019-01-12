@@ -1,9 +1,11 @@
 package gallican.model;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -43,7 +45,7 @@ public class Character
 		track(name, description, personality, powers);
 	}
 
-	@Column(name = "name")
+	@Column(name = "name", nullable = false)
 	@Override
 	public String getName()
 	{
@@ -111,6 +113,7 @@ public class Character
 	}
 
 	@ManyToOne
+	@JoinColumn(name = "Universe_Id", nullable = false)
 	public Universe getUniverse()
 	{
 		return universeProperty().get();
@@ -151,6 +154,12 @@ public class Character
 	public String toString()
 	{
 		return String.format("%d - Name: %s", getId(), getName());
+	}
+
+	@Override
+	public void dispose()
+	{
+		new LinkedList<>(events()).forEach(e -> e.removeCharacter(this));
 	}
 
 	@Override

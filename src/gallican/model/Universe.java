@@ -39,12 +39,20 @@ public class Universe
 
 	private final ObjectProperty<Location> location = new SimpleObjectProperty<>();
 
-	public Universe()
+	public Universe(String name, Location location)
+	{
+		this();
+
+		setName(name);
+		setLocation(location);
+	}
+
+	private Universe()
 	{
 		track(name);
 	}
 
-	@Column(name = "name")
+	@Column(name = "name", nullable = false)
 	public String getName()
 	{
 		return nameProperty().get();
@@ -74,17 +82,16 @@ public class Universe
 	public void removeCharacter(Character character)
 	{
 		getCharacters().remove(character);
-		character.setUniverse(null);
+		character.dispose();
 	}
 
 	@OneToMany(mappedBy = "Universe", orphanRemoval = true, cascade = CascadeType.ALL)
-	@JoinColumn(name = "UniverseId")
 	public List<Character> getCharacters()
 	{
 		return charactersProperty().get();
 	}
 
-	protected void setCharacters(List<Character> characters)
+	void setCharacters(List<Character> characters)
 	{
 		charactersProperty().set(FXCollections.observableArrayList(characters));
 	}
@@ -108,11 +115,10 @@ public class Universe
 	public void removeEvent(Event event)
 	{
 		events.remove(event);
-		event.setUniverse(null);
+		event.dispose();
 	}
 
 	@OneToMany(mappedBy = "Universe", orphanRemoval = true, cascade = CascadeType.ALL)
-	@JoinColumn(name = "UniverseId")
 	List<Event> getEvents()
 	{
 		return events;
@@ -124,6 +130,7 @@ public class Universe
 	}
 
 	@OneToOne(orphanRemoval = true, cascade = CascadeType.ALL)
+	@JoinColumn(name = "Location_Id", nullable = false)
 	public Location getLocation()
 	{
 		return location.get();
@@ -170,5 +177,12 @@ public class Universe
 	protected boolean checkIsValid()
 	{
 		return getName() != null && !getName().isEmpty();
+	}
+
+	@Override
+	public void dispose()
+	{
+		// TODO Auto-generated method stub
+
 	}
 }

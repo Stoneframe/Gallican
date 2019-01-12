@@ -98,6 +98,8 @@ public abstract class EntityBase
 		if (validBinding != null) validBinding.invalidate();
 		if (dirtyBinding != null) dirtyBinding.invalidate();
 	}
+	
+	public abstract void dispose();
 
 	protected abstract boolean checkIsValid();
 

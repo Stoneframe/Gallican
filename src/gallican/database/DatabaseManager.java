@@ -11,17 +11,19 @@ import gallican.database.upgrade.DatabaseUpgrade;
 import gallican.database.upgrade.DatabaseUpgrade2;
 import gallican.database.upgrade.DatabaseUpgrade3;
 import gallican.database.upgrade.DatabaseUpgrade4;
+import gallican.database.upgrade.DatabaseUpgrade5;
 
 public class DatabaseManager
 {
-	private static final int CURRENT_VERSION = 4;
+	private static final int CURRENT_VERSION = 5;
 
 	private final String javaxPersistenceJdbcUrl;
 
 	private final List<DatabaseUpgrade> upgrades = Arrays.asList(
 		new DatabaseUpgrade2(),
 		new DatabaseUpgrade3(),
-		new DatabaseUpgrade4());
+		new DatabaseUpgrade4(),
+		new DatabaseUpgrade5());
 
 	private ApplicationInfo applicationInfo;
 

@@ -39,6 +39,7 @@ public class EventOverviewPane
 		this.entityManager = entityManager;
 
 		eventListView = new ListView<>();
+		eventListView.setMinWidth(400);
 		eventListView.setCellFactory(lc -> new DisplayValueListCell<>());
 		eventListView.itemsProperty().bind(
 			Util.createNestedPropertyBinding(universe, Universe::events));

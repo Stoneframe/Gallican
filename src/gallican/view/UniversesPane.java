@@ -104,12 +104,7 @@ public class UniversesPane
 				{
 					executeWithTransaction(() ->
 						{
-							Location location = new Location();
-							location.setName(name);
-
-							Universe universe = new Universe();
-							universe.setName(name);
-							universe.setLocation(location);
+							Universe universe = new Universe(name, new Location(name));
 
 							entityManager.persist(universe);
 							universes.add(universe);

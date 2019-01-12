@@ -96,6 +96,7 @@ public class LocationPane
 		saveButton.disableProperty().bind(saveBinding);
 
 		eventListView = new ListView<>();
+		eventListView.setMinWidth(400);
 		eventListView.setCellFactory(lc -> new DisplayValueListCell<>());
 		eventListView.disableProperty().bind(Bindings.isNull(location));
 		eventListView.itemsProperty().bind(eventsBinding);

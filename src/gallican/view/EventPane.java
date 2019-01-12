@@ -117,7 +117,7 @@ public class EventPane
 		nameTextField.textProperty().bindBidirectional(nameBinding);
 
 		descriptionTextArea = new TextArea();
-		descriptionTextArea.setMinHeight(300);
+		descriptionTextArea.setMinHeight(400);
 		descriptionTextArea.setWrapText(true);
 		descriptionTextArea.disableProperty().bind(Bindings.isNull(event));
 		descriptionTextArea.textProperty().bindBidirectional(descriptionBinding);

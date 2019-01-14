@@ -38,7 +38,6 @@ public class Gallican
 									event.consume();
 								}
 							});
-
 				}
 			});
 

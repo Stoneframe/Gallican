@@ -16,6 +16,8 @@
             <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/lib/derby.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/lib/eclipselink.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/lib/javax.persistence_2.2.1.v201807122140.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/lib/easybind-1.0.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/lib/commons-io-2.6.jar"/>
         </jar>
     </target>
 </project>

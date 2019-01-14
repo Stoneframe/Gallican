@@ -40,8 +40,6 @@ public class DatabaseManager
 		new DatabaseUpgrade4(),
 		new DatabaseUpgrade5());
 
-	private ApplicationInfo applicationInfo;
-
 	public DatabaseManager() throws ClassNotFoundException
 	{
 		Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
@@ -65,7 +63,7 @@ public class DatabaseManager
 	{
 		try (Connection connection = createConnection())
 		{
-			applicationInfo = new ApplicationInfo(connection);
+			ApplicationInfo applicationInfo = new ApplicationInfo(connection);
 
 			if (!applicationInfo.exists())
 			{

@@ -1,11 +1,25 @@
 package gallican.database;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
+import org.apache.commons.io.FileUtils;
 
 import gallican.database.upgrade.DatabaseUpgrade;
 import gallican.database.upgrade.DatabaseUpgrade2;
@@ -15,9 +29,10 @@ import gallican.database.upgrade.DatabaseUpgrade5;
 
 public class DatabaseManager
 {
-	private static final int CURRENT_VERSION = 5;
+	private static final String PERSISTENCE_UNIT_NAME = "gallican";
+	private static final String DATABASE_NAME = PERSISTENCE_UNIT_NAME + "Db";
 
-	private final String javaxPersistenceJdbcUrl;
+	private static final int CURRENT_VERSION = 5;
 
 	private final List<DatabaseUpgrade> upgrades = Arrays.asList(
 		new DatabaseUpgrade2(),
@@ -27,11 +42,23 @@ public class DatabaseManager
 
 	private ApplicationInfo applicationInfo;
 
-	public DatabaseManager(String javaxPersistenceJdbcUrl) throws ClassNotFoundException
+	public DatabaseManager() throws ClassNotFoundException
 	{
 		Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+	}
 
-		this.javaxPersistenceJdbcUrl = javaxPersistenceJdbcUrl;
+	public void backup() throws IOException
+	{
+		Path databasePath = Paths.get(getDatabasePath());
+
+		if (Files.exists(databasePath))
+		{
+			Path gallicanPath = databasePath.getParent();
+			Path backupDirectoryPath = gallicanPath.resolve("Backup");
+
+			backupDatabase(databasePath, backupDirectoryPath);
+			cleanBackup(backupDirectoryPath);
+		}
 	}
 
 	public void setup()
@@ -62,9 +89,73 @@ public class DatabaseManager
 		}
 	}
 
+	public EntityManager createEntityManager()
+	{
+		Map<String, String> properties = new HashMap<>();
+
+		properties.put("javax.persistence.jdbc.url", getJavaxPersistenceJdbcUrl());
+
+		EntityManagerFactory factory =
+				Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME, properties);
+
+		return factory.createEntityManager();
+	}
+
 	private Connection createConnection() throws SQLException
 	{
-		return DriverManager.getConnection(javaxPersistenceJdbcUrl);
+		return DriverManager.getConnection(getJavaxPersistenceJdbcUrl());
+	}
+
+	private String getJavaxPersistenceJdbcUrl()
+	{
+		return "jdbc:derby:" + getDatabasePath() + ";create=true";
+	}
+
+	private String getDatabasePath()
+	{
+		return Paths
+			.get(
+				System.getProperty("user.home"),
+				"AppData/Local/Gallican",
+				DATABASE_NAME)
+			.toString()
+			.replace("\\", "/");
+	}
+
+	private void backupDatabase(Path databasePath, Path backupDirectoryPath) throws IOException
+	{
+		if (Files.notExists(backupDirectoryPath))
+		{
+			Files.createDirectory(backupDirectoryPath);
+		}
+
+		String backupName = String.format(
+			"%s %s",
+			DATABASE_NAME,
+			LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH_mm_ss")));
+
+		Path backupPath = backupDirectoryPath.resolve(backupName);
+
+		FileUtils.copyDirectory(databasePath.toFile(), backupPath.toFile());
+	}
+
+	private void cleanBackup(Path backupDirectoryPath) throws IOException
+	{
+		Files
+			.list(backupDirectoryPath)
+			.sorted((a, b) -> b.getFileName().compareTo(a.getFileName()))
+			.skip(5)
+			.forEach(f ->
+				{
+					try
+					{
+						FileUtils.deleteDirectory(f.toFile());
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+				});
 	}
 
 	private void updateDatabase(ApplicationInfo applicationInfo, Connection connection)

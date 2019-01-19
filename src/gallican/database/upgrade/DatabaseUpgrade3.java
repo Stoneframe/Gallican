@@ -1,6 +1,7 @@
 package gallican.database.upgrade;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -52,26 +53,25 @@ public class DatabaseUpgrade3
 
 	private void updateUniverseLocation(Connection connection, ResultSet result) throws SQLException
 	{
-		try (Statement statement = connection.createStatement())
+		try (
+			PreparedStatement insertStatement = connection.prepareStatement(
+				"INSERT INTO SA.LOCATIONS (NAME) VALUES (?)",
+				Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement updateStatement = connection.prepareStatement(
+				"UPDATE SA.UNIVERSES SET LOCATION_ID = ? WHERE NAME = ?"))
 		{
 			String name = result.getString("name");
 
-			statement.execute(
-				"INSERT INTO SA.LOCATIONS (NAME) VALUES ('" + name + "')",
-				Statement.RETURN_GENERATED_KEYS);
+			insertStatement.setString(1, name);
+			insertStatement.execute();
 
-			ResultSet idResult = statement.getGeneratedKeys();
-
+			ResultSet idResult = insertStatement.getGeneratedKeys();
 			idResult.next();
-
 			int id = idResult.getInt(1);
 
-			statement.execute(
-				"UPDATE SA.UNIVERSES SET LOCATION_ID = "
-						+ id
-						+ "WHERE NAME = '"
-						+ name
-						+ "'");
+			updateStatement.setInt(1, id);
+			updateStatement.setString(2, name);
+			updateStatement.execute();
 		}
 	}
 }

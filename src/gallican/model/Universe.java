@@ -148,7 +148,7 @@ public class Universe
 
 	public boolean hasDirtyChildren()
 	{
-		return anyDirtyCharacters() || anyDirtyLocations();
+		return anyDirtyCharacters() || anyDirtyLocations() || anyDirtyEvents();
 	}
 
 	@Override
@@ -167,6 +167,11 @@ public class Universe
 		return isLocationDirty(getLocation());
 	}
 
+	private boolean anyDirtyEvents()
+	{
+		return getEvents().stream().anyMatch(e -> e.isDirty());
+	}
+
 	private boolean isLocationDirty(Location location)
 	{
 		return location.isDirty()
@@ -182,7 +187,5 @@ public class Universe
 	@Override
 	public void dispose()
 	{
-		// TODO Auto-generated method stub
-
 	}
 }

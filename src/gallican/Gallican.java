@@ -12,40 +12,47 @@ public class Gallican
 	extends Application
 {
 	@Override
-	public void start(Stage stage) throws Exception
+	public void start(Stage stage)
 	{
-		DatabaseManager databaseManager = new DatabaseManager();
+		try
+		{
+			DatabaseManager databaseManager = new DatabaseManager();
 
-		databaseManager.backup();
-		databaseManager.setup();
+			databaseManager.backup();
+			databaseManager.setup();
 
-		GallicanPane gallicanPane = new GallicanPane(databaseManager.createEntityManager());
+			GallicanPane gallicanPane = new GallicanPane(databaseManager.createEntityManager());
 
-		Scene scene = new Scene(gallicanPane);
+			Scene scene = new Scene(gallicanPane);
 
-		stage.setOnCloseRequest((event) ->
-			{
-				if (gallicanPane.isDirty())
+			stage.setOnCloseRequest((event) ->
 				{
-					Util.showConfirmationDialog(
-						"Unsaved entities!",
-						"You are about to close with unsaved entities.",
-						"Do you want to close?",
-						buttonType ->
-							{
-								if (buttonType != ButtonType.OK)
+					if (gallicanPane.isDirty())
+					{
+						Util.showConfirmationDialog(
+							"Unsaved entities!",
+							"You are about to close with unsaved entities.",
+							"Do you want to close?",
+							buttonType ->
 								{
-									event.consume();
-								}
-							});
-				}
-			});
+									if (buttonType != ButtonType.OK)
+									{
+										event.consume();
+									}
+								});
+					}
+				});
 
-		stage.setTitle("Gallican");
-		stage.setScene(scene);
-		stage.sizeToScene();
-		stage.setResizable(false);
-		stage.show();
+			stage.setTitle("Gallican");
+			stage.setScene(scene);
+			stage.sizeToScene();
+			stage.setResizable(false);
+			stage.show();
+		}
+		catch (Exception e)
+		{
+			Util.showErrorDialog("Crash!", "Gallican has crashed!", e.getMessage());
+		}
 	}
 
 	public static void main(String[] args)

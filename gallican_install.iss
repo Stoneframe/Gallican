@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Gallican"
-#define MyAppVersion "1.3"
+#define MyAppVersion "1.4"
 #define MyAppExeName "Gallican.exe"
 
 [Setup]

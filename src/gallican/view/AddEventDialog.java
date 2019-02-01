@@ -29,6 +29,8 @@ public class AddEventDialog
 
 		DatePicker date = new DatePicker();
 		TextField name = new TextField();
+		
+		date.setConverter(new SimpleStringConverter());
 
 		grid.add(new Label("Date:"), 0, 0);
 		grid.add(date, 1, 0);

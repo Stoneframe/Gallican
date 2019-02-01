@@ -26,19 +26,21 @@ import gallican.database.upgrade.DatabaseUpgrade2;
 import gallican.database.upgrade.DatabaseUpgrade3;
 import gallican.database.upgrade.DatabaseUpgrade4;
 import gallican.database.upgrade.DatabaseUpgrade5;
+import gallican.database.upgrade.DatabaseUpgrade6;
 
 public class DatabaseManager
 {
 	private static final String PERSISTENCE_UNIT_NAME = "gallican";
 	private static final String DATABASE_NAME = PERSISTENCE_UNIT_NAME + "Db";
 
-	private static final int CURRENT_VERSION = 5;
+	private static final int CURRENT_VERSION = 6;
 
 	private final List<DatabaseUpgrade> upgrades = Arrays.asList(
 		new DatabaseUpgrade2(),
 		new DatabaseUpgrade3(),
 		new DatabaseUpgrade4(),
-		new DatabaseUpgrade5());
+		new DatabaseUpgrade5(),
+		new DatabaseUpgrade6());
 
 	public DatabaseManager() throws ClassNotFoundException
 	{

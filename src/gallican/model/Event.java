@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -13,6 +14,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import gallican.database.converters.LocalDateToLongConverter;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -64,6 +66,7 @@ public class Event
 	}
 
 	@Column(name = "Date", nullable = false)
+	@Convert(converter = LocalDateToLongConverter.class)
 	public LocalDate getDate()
 	{
 		return date.get();

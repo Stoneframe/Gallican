@@ -110,6 +110,7 @@ public class EventPane
 		datePicker.setMinWidth(200);
 		datePicker.disableProperty().bind(Bindings.isNull(event));
 		datePicker.valueProperty().bindBidirectional(dateBinding);
+		datePicker.setConverter(new SimpleStringConverter());
 
 		nameTextField = new TextField();
 		nameTextField.setMinWidth(200);

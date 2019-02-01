@@ -51,7 +51,8 @@ public class Gallican
 		}
 		catch (Exception e)
 		{
-			Util.showErrorDialog("Crash!", "Gallican has crashed!", e.getMessage());
+			Util.showErrorDialog("Crash!", "Gallican has crashed!", e.toString());
+			e.printStackTrace();
 		}
 	}
 
